@@ -1,0 +1,32 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.enkidu.audiodownloader'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.enkidu.soundcairn'
+        minSdk 29
+        targetSdk 35
+        versionCode 1
+        versionName '0.1.0'
+        // Most phones are arm64. Add 'armeabi-v7a' for old 32-bit ones, it adds about 60 MB.
+        ndk { abiFilters 'arm64-v8a' }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions { jvmTarget = '17' }
+    // yt-dlp's python and ffmpeg are native files that must be unpacked to disk to run.
+    packaging { jniLibs { useLegacyPackaging = true } }
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'io.github.junkfood02.youtubedl-android:library:0.18.1'
+    implementation 'io.github.junkfood02.youtubedl-android:ffmpeg:0.18.1'
+}

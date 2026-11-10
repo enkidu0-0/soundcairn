@@ -1,0 +1,56 @@
+{
+  "name": "soundcairn",
+  "version": "0.1.0",
+  "description": "Save audio and video from links. Made by Afif aka Enkidu.",
+  "author": "Afif aka Enkidu",
+  "license": "MIT",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test",
+    "pack": "electron-packager . \"Soundcairn\" --platform=darwin --arch=arm64 --out=dist --overwrite --icon=build/icon.icns",
+    "dist:win": "electron-builder --win"
+  },
+  "devDependencies": {
+    "@electron/packager": "18.3.6",
+    "electron": "33.4.11",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.enkidu.soundcairn",
+    "productName": "Soundcairn",
+    "copyright": "Copyright (c) Afif aka Enkidu",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "lib.js",
+      "app/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "signAndEditExecutable": false,
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "Soundcairn-Setup-${version}.${ext}"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/enkidu0-0/soundcairn.git"
+  },
+  "homepage": "https://github.com/enkidu0-0/soundcairn"
+}

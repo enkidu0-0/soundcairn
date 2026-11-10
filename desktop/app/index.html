@@ -1,0 +1,858 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Soundcairn</title>
+<meta name="author" content="Afif aka Enkidu">
+<!-- Made by Afif aka Enkidu -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: one phone-width column on small screens, sidebar + two columns on wide ones. Single light look. */
+:root {
+  --bg: #FDF5FC;
+  --surround: #EEE6EF;
+  --ink: #2B0828;
+  --muted: #8C8196;
+  --pink: #F9C6E5;
+  --pink-soft: #FCE3F2;
+  --pink-track: #F6D3EA;
+  --card: #FFFFFF;
+  --line: #EDE3EE;
+  --font: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--surround); color: var(--ink); font-family: var(--font); }
+button { font: inherit; color: inherit; border: 0; background: none; padding: 0; cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+svg.i { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+.app { position: relative; height: 100%; max-width: 430px; margin: 0 auto; background: var(--bg); overflow: hidden; }
+.screen { position: absolute; inset: 0; overflow-y: auto; padding-block: 20px 120px;
+  padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+.top { display: flex; align-items: center; justify-content: space-between; min-height: 52px; }
+.round { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; }
+.round.dark { background: var(--ink); color: #fff; }
+.round.ghost { background: rgba(255,255,255,.08); color: #fff; }
+.round.plain { width: 40px; }
+
+/* Home */
+.hello { margin: 22px 0 0; font-size: 18px; color: var(--muted); font-weight: 500; }
+h1 { margin: 6px 0 0; font-size: 34px; line-height: 1.12; font-weight: 800; letter-spacing: -.02em; text-wrap: balance; }
+.hero { display: block; width: 100%; max-width: 100%; margin: 4px 0 -6px; }
+.paste { display: flex; align-items: center; gap: 10px; background: var(--card); border-radius: 40px; padding: 10px 10px 10px 18px; box-shadow: 0 6px 24px rgba(43,8,40,.06); }
+.paste input { flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 17px; color: var(--ink); }
+.paste input::placeholder { color: var(--muted); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--ink); color: #fff; font-weight: 700; border-radius: 999px; }
+.paste .btn { height: 52px; padding: 0 20px; font-size: 17px; white-space: nowrap; }
+.chips { display: flex; gap: 6px; margin-top: 16px; flex-wrap: wrap; }
+.chip { display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); font-weight: 600; font-size: 14px; background: transparent; }
+.chip.on { background: var(--pink); border-color: var(--pink); }
+.chip .dot { width: 16px; height: 16px; border-radius: 50%; background: var(--ink); }
+.chip svg.i { width: 20px; height: 20px; }
+.sec { display: flex; align-items: baseline; justify-content: space-between; margin: 28px 0 12px; }
+.sec h2 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -.01em; }
+.sec button { color: var(--muted); font-weight: 600; font-size: 15px; display: inline-flex; align-items: center; gap: 2px; }
+.sec svg.i { width: 18px; height: 18px; }
+.list { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.row { display: flex; align-items: center; gap: 14px; background: var(--card); border-radius: 28px; padding: 10px; box-shadow: 0 6px 24px rgba(43,8,40,.05); }
+.row img { width: 88px; height: 66px; border-radius: 16px; object-fit: cover; flex: none; }
+.row .t { flex: 1; min-width: 0; }
+.row .t b { display: block; font-size: 17px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row .t span { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 14px; margin-top: 6px; }
+.row .t span svg.i { width: 16px; height: 16px; }
+.row .go { width: 48px; height: 48px; border-radius: 50%; background: var(--pink); display: grid; place-items: center; flex: none; }
+.row .go svg.i { fill: currentColor; stroke-width: 0; width: 20px; height: 20px; }
+.row .bar { height: 6px; border-radius: 3px; background: #EFE7F0; margin-top: 8px; overflow: hidden; }
+.row .bar i { display: block; height: 100%; background: var(--pink); width: 0; border-radius: 3px; }
+
+/* Tab bar */
+.tabs { position: absolute; left: 16px; right: 16px; bottom: max(16px, env(safe-area-inset-bottom, 0px)); height: 76px; background: var(--card); border-radius: 40px; display: flex; align-items: center; justify-content: space-around; box-shadow: 0 8px 30px rgba(43,8,40,.1); z-index: 5; }
+.tab { width: 64px; height: 56px; display: grid; place-items: center; color: var(--muted); position: relative; }
+.tab svg.i { width: 30px; height: 30px; }
+.tab.on { color: var(--ink); }
+.tab.on svg.i { fill: currentColor; }
+.pill { position: absolute; left: 0; top: 0; width: 0; height: 0; border-radius: 22px; background: var(--pink); z-index: 0; transition: transform .45s cubic-bezier(.3,1.25,.5,1), width .3s, height .3s; }
+.tab svg.i { position: relative; z-index: 1; }
+#tab-library.on svg.i, #tab-downloads.on svg.i, #tab-settings.on svg.i { fill: none; stroke-width: 2.4; }
+
+/* Preview */
+#preview { background: var(--ink); color: #fff; padding-bottom: 0; display: flex; flex-direction: column; }
+.cover { position: relative; margin-top: 16px; border-radius: 28px; overflow: hidden; height: 150px; flex: none; }
+.cover img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; opacity: 0; transition: opacity .4s; }
+.cover img.ready { opacity: 1; }
+.badge { position: absolute; right: 12px; bottom: 12px; display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 999px; background: rgba(43,8,40,.72); font-weight: 600; font-size: 15px; }
+.badge svg.i { width: 20px; height: 20px; }
+#preview h1 { font-size: 28px; margin-top: 14px; }
+.by { display: flex; align-items: center; gap: 12px; margin: 10px 0 14px; color: #D9C9DA; font-size: 17px; font-weight: 500; }
+.by .round { width: 40px; height: 40px; background: #5A2D58; }
+.by svg.i { width: 20px; height: 20px; fill: #fff; stroke: none; }
+.sheet { margin: auto -20px 0; background: #fff; color: var(--ink); border-radius: 32px 32px 0 0; padding: 12px 20px max(24px, env(safe-area-inset-bottom, 0px)); }
+.handle { width: 44px; height: 5px; border-radius: 3px; background: #D8D3DB; margin: 0 auto 14px; }
+.sheet h2 { margin: 0 0 12px; font-size: 26px; font-weight: 800; }
+.opts { display: grid; gap: 10px; }
+.opt { display: flex; align-items: center; gap: 14px; text-align: left; border: 1.5px solid var(--line); border-radius: 22px; padding: 10px 18px 10px 12px; width: 100%; }
+.opt.on { background: var(--pink-soft); border-color: var(--pink); }
+.opt .rd { width: 34px; height: 34px; border-radius: 50%; border: 2px solid #B9B2BE; flex: none; display: grid; place-items: center; }
+.opt.on .rd { background: var(--ink); border-color: var(--ink); color: #fff; }
+.opt .rd svg.i { width: 18px; height: 18px; stroke-width: 3; display: none; }
+.opt.on .rd svg.i { display: block; }
+.opt .tx { flex: 1; }
+.opt .tx b { display: block; font-size: 18px; font-weight: 700; }
+.opt .tx span { color: var(--muted); font-size: 14px; }
+.opt .sz { font-weight: 700; font-size: 17px; }
+.cov { display: flex; align-items: center; gap: 12px; margin: 12px 0 14px; padding-top: 12px; border-top: 1px solid var(--line); font-weight: 600; font-size: 17px; }
+.cov .ic { width: 44px; height: 44px; border-radius: 14px; background: var(--pink-soft); display: grid; place-items: center; }
+.cov .lbl { flex: 1; }
+.sw { width: 62px; height: 36px; border-radius: 18px; background: #CFC8D3; position: relative; transition: background .15s; flex: none; }
+.sw::after { content: ""; position: absolute; top: 4px; left: 4px; width: 28px; height: 28px; border-radius: 50%; background: #fff; transition: transform .15s; }
+.sw[aria-checked="true"] { background: var(--ink); }
+.sw[aria-checked="true"]::after { transform: translateX(26px); }
+.sheet .btn { width: 100%; height: 60px; font-size: 19px; }
+
+/* Downloading */
+.head { display: grid; grid-template-columns: 40px 1fr 40px; align-items: center; min-height: 52px; text-align: center; }
+.head h3 { margin: 0; font-size: 24px; font-weight: 800; }
+.ringwrap { position: relative; width: 224px; height: 224px; margin: 30px auto 0; display: grid; place-items: center; }
+.ringwrap::before { content: ""; position: absolute; inset: -26px; border-radius: 50%; background: radial-gradient(closest-side, rgba(249,198,229,.55), rgba(249,198,229,0) 100%); }
+.ringwrap svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.ringwrap circle { fill: none; stroke-width: 20; }
+.pct { position: relative; font-size: 56px; font-weight: 800; letter-spacing: -.02em; }
+.pct small { font-size: 28px; font-weight: 700; }
+.sub { text-align: center; margin-top: 28px; font-size: 24px; font-weight: 800; }
+.spd { display: flex; justify-content: center; align-items: center; gap: 6px; color: var(--muted); font-size: 18px; font-weight: 500; margin-top: 8px; min-height: 28px; }
+.ctrls { display: flex; justify-content: center; gap: 34px; margin-top: 22px; }
+.ctrl { display: grid; justify-items: center; gap: 8px; color: var(--muted); font-size: 16px; font-weight: 500; }
+.ctrl .c { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; border: 1.5px solid #D9D2DD; color: var(--ink); }
+.ctrl .c.fill { background: var(--ink); border-color: var(--ink); color: #fff; }
+.ctrl .c.fill svg.i { fill: currentColor; stroke: none; }
+.card { background: var(--card); border-radius: 28px; padding: 18px 14px 14px; margin-top: 30px; box-shadow: 0 6px 24px rgba(43,8,40,.05); }
+.card h2 { margin: 0 0 12px 8px; font-size: 22px; font-weight: 800; }
+.card .row { box-shadow: none; border: 1px solid var(--line); border-radius: 22px; }
+.card .row .go { background: var(--pink-soft); }
+.card .row .go svg.i { fill: none; stroke: currentColor; stroke-width: 1.7; }
+
+/* Player */
+.orbwrap { position: relative; width: 250px; height: 250px; margin: 56px auto 0; }
+.orbwrap::before { content: ""; position: absolute; inset: -30px; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,143,200,.35), rgba(255,143,200,0)); }
+.orb { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 50% 30%, #FFB0D8 0%, #FF8CC6 70%, #FF7DBE 100%); box-shadow: 0 20px 60px rgba(255,125,190,.35); overflow: hidden; }
+.orb svg { position: absolute; left: 0; right: 0; top: 34%; width: 100%; height: 30%; }
+.spark { position: absolute; right: -34px; top: 6px; width: 54px; height: 44px; stroke: #FF8CC6; stroke-width: 3; stroke-linecap: round; }
+.ptitle { text-align: center; font-size: 30px; font-weight: 800; margin: 52px 0 0; letter-spacing: -.01em; }
+.psub { text-align: center; color: var(--muted); font-size: 20px; font-weight: 500; margin-top: 8px; }
+.scrub { display: flex; align-items: center; gap: 10px; margin-top: 34px; font-size: 15px; font-variant-numeric: tabular-nums; }
+.bars { flex: 1; height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 3px; cursor: pointer; min-width: 0; }
+.bars i { flex: 1; min-width: 2px; max-width: 5px; border-radius: 2px; background: #E7DDE9; }
+.bars i.d { background: var(--ink); }
+.pc { display: flex; align-items: center; justify-content: center; gap: 36px; margin-top: 26px; }
+.pc .skip { position: relative; width: 52px; height: 52px; display: grid; place-items: center; }
+.pc .skip svg.i { width: 46px; height: 46px; stroke-width: 2; }
+.pc .play { width: 88px; height: 88px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; }
+.pc .play svg.i { fill: #fff; stroke: none; width: 34px; height: 34px; }
+.mini { display: flex; justify-content: center; gap: 14px; margin-top: 26px; }
+.mini button { min-width: 108px; height: 52px; padding: 0 22px; border-radius: 999px; background: #F1EAF2; font-weight: 700; font-size: 20px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.mini button.on { background: var(--pink); }
+
+/* Extras: mode switch, toast, empty states, settings, thumbnails without art */
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; padding: 4px; border-radius: 999px; background: var(--pink-soft); margin-bottom: 12px; }
+.seg button { min-width: 0; padding: 0 6px; height: 44px; border-radius: 999px; font-weight: 700; font-size: 16px; color: var(--muted); transition: background .2s, color .2s; }
+.seg button.on { background: var(--ink); color: #fff; }
+.seg button:disabled { opacity: .4; cursor: not-allowed; }
+.menu { position: fixed; z-index: 30; min-width: 230px; padding: 6px; background: var(--card); color: var(--ink); border-radius: 20px; box-shadow: 0 14px 40px rgba(43,8,40,.28); animation: pop .18s cubic-bezier(.3,1.4,.5,1); transform-origin: top right; }
+.menu button { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 16px; border-radius: 14px; font-weight: 700; font-size: 16px; text-align: left; }
+.menu button:hover { background: var(--pink-soft); }
+/* Desktop window without a native title bar: a strip you can drag, and room for the window buttons. */
+.drag { display: none; position: fixed; top: 0; left: 0; right: 0; height: 36px; z-index: 40; -webkit-app-region: drag; }
+.frameless .drag { display: block; }
+.frameless .screen { padding-top: 44px; }
+/* Name prompt */
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+.welcome { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 20px; background: rgba(253,245,252,.82); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); animation: fade .3s both; }
+.wcard { width: min(100%, 400px); background: var(--card); border-radius: 36px; padding: 34px 28px 26px; text-align: center; box-shadow: 0 24px 70px rgba(43,8,40,.18); animation: pop .5s cubic-bezier(.3,1.4,.5,1) both; display: grid; gap: 14px; justify-items: center; }
+.wlogo { width: 76px; height: 81px; overflow: visible; animation: float 3.4s 1.3s ease-in-out infinite; filter: drop-shadow(0 10px 18px rgba(255,70,178,.35)); }
+/* the stones stack up one by one, bottom first */
+@keyframes drop { from { opacity: 0; transform: translateY(-46px) scale(.5); } to { opacity: 1; transform: none; } }
+.wlogo > :not(defs) { transform-box: fill-box; transform-origin: center; animation: drop .65s cubic-bezier(.3,1.5,.5,1) both; }
+.wlogo > :nth-child(5) { animation-delay: .25s; }
+.wlogo > :nth-child(4) { animation-delay: .42s; }
+.wlogo > :nth-child(3) { animation-delay: .59s; }
+.wlogo > :nth-child(2) { animation-delay: .76s; }
+.wcard > h2, .wcard > p, .wcard > input, .wcard > .btn, .wcard > .linkbtn { animation: rise .6s cubic-bezier(.22,.8,.24,1) backwards; }
+.wcard > h2 { animation-delay: .95s; }
+.wcard > p { animation-delay: 1.05s; }
+.wcard > input { animation-delay: 1.15s; }
+.wcard > .btn { animation-delay: 1.25s; }
+.wcard > .linkbtn { animation-delay: 1.3s; }
+@keyframes leave { to { opacity: 0; transform: translateY(18px) scale(.94); } }
+.welcome.leaving { pointer-events: none; animation: fade .35s reverse both; }
+.welcome.leaving .wcard { animation: leave .35s ease-in both; }
+.hello .nm { display: inline-block; color: var(--ink); font-weight: 800; animation: nameIn .7s cubic-bezier(.3,1.5,.5,1) both; }
+@keyframes nameIn { from { opacity: 0; transform: translateY(14px) scale(.8); } to { opacity: 1; transform: none; } }
+.wcard h2 { margin: 6px 0 0; font-size: 28px; font-weight: 800; letter-spacing: -.01em; text-wrap: balance; }
+.wcard p { margin: 0; color: var(--muted); font-size: 16px; font-weight: 500; }
+.wcard input { width: 100%; height: 58px; margin-top: 8px; border: 1.5px solid var(--line); border-radius: 999px; padding: 0 22px; font: inherit; font-size: 19px; font-weight: 600; text-align: center; color: var(--ink); background: var(--bg); }
+.wcard input:focus { border-color: var(--ink); outline: none; }
+.wcard .btn { width: 100%; height: 58px; font-size: 18px; }
+.wcard .btn:disabled { opacity: .4; cursor: not-allowed; }
+.linkbtn { color: var(--muted); font-weight: 700; font-size: 15px; padding: 6px 12px; }
+/* Buy me a chai */
+.chai-hero { display: grid; place-items: center; margin-top: 18px; color: var(--ink); }
+.chai-hero .cup { width: 120px; height: 130px; }
+.cup { color: var(--ink); overflow: visible; }
+.cup .steam path { stroke-dasharray: 16; animation: steam 2.6s ease-in-out infinite; opacity: .5; }
+.cup .steam path:nth-child(2) { animation-delay: .5s; }
+.cup .steam path:nth-child(3) { animation-delay: 1s; }
+@keyframes steam { 0% { stroke-dashoffset: 16; opacity: 0; transform: translateY(4px); } 40% { opacity: .6; } 100% { stroke-dashoffset: -16; opacity: 0; transform: translateY(-6px); } }
+.sup-lead { text-align: center; color: var(--muted); font-size: 18px; font-weight: 500; margin: 14px auto 22px; max-width: 420px; text-wrap: balance; }
+.opts.chai .cup { width: 44px; height: 48px; flex: none; }
+.opts.chai .cup.l { width: 54px; height: 58px; }
+.opts.dense { gap: 6px; }
+.opts.dense .opt { padding: 6px 16px 6px 10px; }
+.opts.dense .opt .rd { width: 28px; height: 28px; }
+.opts.dense .opt .tx b { font-size: 16px; }
+.opts.chai .opt { padding: 10px 20px 10px 16px; }
+.opts.chai .cup { width: 40px; height: 44px; }
+.opt.custom { cursor: pointer; }
+.amt { display: inline-flex; align-items: center; gap: 4px; font-weight: 800; font-size: 18px; }
+.amt input { width: 84px; height: 40px; border: 1.5px solid var(--line); border-radius: 14px; padding: 0 10px; font: inherit; font-weight: 800; font-size: 17px; text-align: right; color: var(--ink); background: var(--bg); }
+.amt input:focus { border-color: var(--ink); outline: none; }
+.pay { margin-top: 20px; display: grid; justify-items: center; gap: 12px; animation: rise .5s both; }
+.pay .btn { width: 100%; height: 60px; font-size: 18px; text-decoration: none; }
+.qrbox { width: 210px; padding: 14px; background: #fff; border-radius: 24px; box-shadow: 0 8px 28px rgba(43,8,40,.1); }
+.qrbox svg { display: block; width: 100%; height: auto; }
+.pay small { color: var(--muted); font-weight: 600; font-size: 14px; }
+.pay .upi { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; }
+.sup-note { text-align: center; color: var(--muted); font-weight: 600; }
+.chai-card { display: flex; align-items: center; gap: 14px; width: 100%; margin-top: 18px; padding: 14px 18px; border-radius: 28px; background: var(--pink-soft); text-align: left; transition: transform .18s; }
+.chai-card:active { transform: scale(.98); }
+.chai-card .cup { width: 36px; height: 40px; flex: none; }
+.chai-card span { flex: 1; }
+.chai-card b { display: block; font-size: 17px; font-weight: 800; }
+.chai-card small { color: var(--muted); font-size: 14px; font-weight: 600; }
+.hint { margin: 10px 6px 0; color: var(--muted); font-size: 15px; font-weight: 600; min-height: 22px; }
+#homeSeg { margin: 16px 0 0; }
+.toast { position: fixed; left: 50%; bottom: 110px; transform: translateX(-50%); max-width: min(90vw, 420px); background: var(--ink); color: #fff; padding: 14px 20px; border-radius: 20px; font-weight: 600; font-size: 15px; z-index: 20; box-shadow: 0 10px 30px rgba(43,8,40,.3); animation: rise .3s both; }
+.empty { color: var(--muted); font-size: 17px; font-weight: 500; text-align: center; padding: 28px 12px; background: var(--card); border-radius: 28px; }
+.setup { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 14px; padding: 12px 16px; border-radius: 18px; background: #FFE9EC; color: #7A1230; font-weight: 600; font-size: 14px; }
+.dlt { text-align: center; margin: 22px 8px 0; color: var(--muted); font-size: 17px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dlt + .sub { margin-top: 8px; }
+.row .ph { width: 88px; height: 66px; border-radius: 16px; flex: none; background: linear-gradient(135deg, var(--pink), #C9A7E6); display: grid; place-items: center; color: #fff; }
+.row[data-focus], .row[data-play] { cursor: pointer; }
+.set { display: flex; align-items: center; gap: 14px; background: var(--card); border-radius: 28px; padding: 18px 20px; margin-top: 14px; box-shadow: 0 6px 24px rgba(43,8,40,.05); }
+.set .lbl { flex: 1; min-width: 0; }
+.set .lbl b { display: block; font-size: 18px; font-weight: 700; }
+.set .lbl span { display: block; color: var(--muted); font-size: 14px; margin-top: 4px; word-break: break-all; }
+.sheet .btn.small { width: auto; height: 44px; font-size: 15px; flex: none; }
+.cov.where { margin-top: 0; }
+.cov.where .lbl { min-width: 0; font-size: 15px; }
+.cov.where small { display: block; color: var(--muted); font-size: 12px; font-weight: 600; }
+.cov.where #whereLbl { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.btn.small { height: 44px; padding: 0 18px; font-size: 15px; }
+.btn.alt { background: var(--pink); color: var(--ink); }
+.credit { margin: 40px 0 0; text-align: center; color: var(--muted); font-weight: 600; font-size: 15px; }
+#media { display: none; }
+#player.isvideo #media { display: block; width: 100%; max-height: 40vh; margin-top: 24px; border-radius: 28px; background: #000; }
+#player.isvideo .orbwrap { display: none; }
+#player.isvideo .ptitle { margin-top: 28px; }
+
+/* Motion: screens slide in the direction you are going, lists rise in, controls press down. */
+@keyframes inFwd { from { opacity: 0; transform: translateX(32px); } to { opacity: 1; transform: none; } }
+@keyframes inBack { from { opacity: 0; transform: translateX(-32px); } to { opacity: 1; transform: none; } }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes pop { from { opacity: 0; transform: scale(.8); } to { opacity: 1; transform: scale(1); } }
+@keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.045); } }
+.screen.in-fwd > *, .screen.in-back > * { animation: rise .5s cubic-bezier(.22,.8,.24,1) both; animation-delay: calc(var(--i, 0) * 45ms + 60ms); }
+@keyframes pulse { 0% { transform: scale(1); } 40% { transform: scale(1.07); } 100% { transform: scale(1); } }
+.ringwrap.done { animation: pulse .6s ease; }
+.in-fwd { animation: inFwd .36s cubic-bezier(.22,.8,.24,1) both; }
+.in-back { animation: inBack .36s cubic-bezier(.22,.8,.24,1) both; }
+.list .row, .empty { animation: rise .42s cubic-bezier(.22,.8,.24,1) both; animation-delay: calc(var(--n, 0) * 55ms); }
+.tab, .tab svg.i, .btn, .round, .chip, .ctrl .c, .pc .play, .skip, .mini button, .opt { transition: transform .18s, background .2s, color .2s, border-color .2s; }
+.tab.on svg.i { transform: translateY(-2px) scale(1.08); }
+.tab:active svg.i, .btn:active, .round:active, .chip:active, .ctrl:active .c, .pc .play:active, .skip:active, .mini button:active, .opt:active { transform: scale(.93); }
+#ring { transition: stroke-dashoffset .4s ease; }
+.row .bar i { transition: width .4s ease; }
+#player.playing .orb { animation: breathe 3.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+.soon { margin: 120px 0 0; text-align: center; color: var(--muted); font-size: 18px; font-weight: 500; }
+@media (prefers-reduced-motion: reduce) { .sw, .sw::after { transition: none; } }
+@media (min-width: 431px) { .app { margin-block: 0; box-shadow: 0 0 60px rgba(43,8,40,.12); } }
+
+/* Desktop: full-width app, tab bar becomes a left sidebar, screens turn into two columns. */
+@media (min-width: 900px) {
+  body { background: var(--bg); }
+  .app { max-width: none; box-shadow: none; }
+  .screen { padding: 36px max(48px, calc((100% - 1120px) / 2)) 48px max(150px, calc((100% - 1120px) / 2)); }
+  #preview, #player { padding-left: max(48px, calc((100% - 1120px) / 2)); }
+
+  .tabs { left: 24px; top: 24px; bottom: 24px; right: auto; width: 92px; height: auto; flex-direction: column; justify-content: flex-start; gap: 14px; padding-top: 28px; border-radius: 36px; }
+  .frameless .tabs { top: 48px; }
+  .tab { width: 64px; height: 64px; border-radius: 22px; }
+  .tab:hover:not(.on) { background: var(--pink-soft); }
+  .pill { border-radius: 22px; }
+
+  /* Home: text left, illustration right, recent items in a grid below */
+  #home { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 56px; align-content: start; }
+  #home > .top, #home > .sec, #home > .list, #home > .chai-card { grid-column: 1 / -1; }
+  #home > .hello, #home > h1, #home > .paste, #home > .chips, #home > .seg, #home > .hint { grid-column: 1; }
+  #home > .hero { grid-column: 2; grid-row: 2 / span 6; align-self: center; margin: 0; }
+  #home .hello { margin-top: 56px; font-size: 20px; }
+  #home h1 { font-size: 54px; margin-bottom: 32px; }
+  #home .paste { padding: 12px 12px 12px 22px; }
+  #home .chips { margin-bottom: auto; }
+  #home .sec { margin-top: 48px; }
+  .list, #libList { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+  #home .list { align-content: start; }
+
+  /* Preview: cover + title left, quality card right */
+  #preview { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); column-gap: 56px; grid-template-rows: auto auto auto auto 1fr; align-content: start; }
+  #preview > .top { grid-column: 1 / -1; }
+  #preview > .cover, #preview > h1, #preview > .by { grid-column: 1; }
+  #preview .cover { height: auto; aspect-ratio: 16 / 9; }
+  #preview h1 { font-size: 40px; }
+  #preview .sheet { grid-column: 2; grid-row: 2 / 6; align-self: start; margin: 16px 0 0; border-radius: 32px; padding: 28px; }
+  #preview .handle { display: none; }
+
+  /* Downloading: progress left, queue right */
+  #downloads { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 56px; align-content: start; }
+  #downloads > .head { grid-column: 1 / -1; }
+  #downloads > .ringwrap, #downloads > .dlt, #downloads > .sub, #downloads > .spd, #downloads > .ctrls { grid-column: 1; }
+  #downloads > .card { grid-column: 2; grid-row: 2 / span 4; align-self: start; margin-top: 30px; }
+  #downloads .head { grid-template-columns: 40px 1fr 40px; }
+
+  /* Player: one centred column */
+  #player > *, #support > * { max-width: 520px; margin-left: auto; margin-right: auto; }
+  #player > .head, #support > .head { max-width: 760px; }
+  #player .orbwrap { width: 280px; height: 280px; margin-top: 28px; }
+  #player .ptitle { margin-top: 44px; }
+
+  #library > .top, #settings > .top { margin-bottom: 8px; }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="currentColor" stroke="none"/><path d="M4.5 20c.8-4 3.8-6 7.5-6s6.700 2 7.500 6z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.700 0l3-3a4 4 0 0 0-5.700-5.700l-1 1"/><path d="M14 10a4 4 0 0 0-5.700 0l-3 3a4 4 0 0 0 5.700 5.700l1-1"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3.500 2.600 5.300 5.800.8-4.200 4.100 1 5.800-5.200-2.700-5.200 2.700 1-5.800L3.600 9.600l5.800-.8z"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11m0 0-4.500-4.500M12 15l4.500-4.500M5 19.500h14"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v8.500a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-lib" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="16" rx="2"/><rect x="13" y="4" width="7" height="16" rx="2"/><path d="M7.500 8h0M16.500 16h0"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.200"/><path d="M12 3v2.500M12 18.500V21M3 12h2.500M18.500 12H21M5.600 5.600l1.800 1.800M16.600 16.600l1.800 1.800M5.600 18.400l1.800-1.800M16.600 7.400l1.800-1.800"/><circle cx="12" cy="12" r="6.800"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.500"/><path d="M12 7.500V12l3 2"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="m14.500 5-7 7 7 7"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="m9.500 5 7 7-7 7"/></symbol>
+  <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.600" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.600" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.600" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.500v13l11-6.500z"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1.200"/><rect x="14" y="5" width="4" height="14" rx="1.200"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3 5 13.500h6L10 21l8-10.500h-6z" fill="currentColor"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3.500" y="4.500" width="17" height="15" rx="2.500"/><circle cx="9" cy="10" r="1.800" fill="currentColor" stroke="none"/><path d="m4 17 5-4.500 4 3.500 3-2.500 4 3.500"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3.500 7.500a2 2 0 0 1 2-2h4l2 2.500h7a2 2 0 0 1 2 2v7.500a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.500 4.500 4.500L19 7.500"/></symbol>
+  <symbol id="i-timer" viewBox="0 0 24 24"><circle cx="12" cy="13.500" r="7"/><path d="M12 13.500V9.500M9.500 3.500h5"/></symbol>
+  <symbol id="i-back10" viewBox="0 0 48 48"><path d="M16 12.500A15 15 0 1 1 9 24" fill="none"/><path d="m16.500 5.500-1 7.500 7.500-1"/><text x="24" y="30" text-anchor="middle" font-size="14" font-weight="700" fill="currentColor" stroke="none" font-family="Plus Jakarta Sans, sans-serif">10</text></symbol>
+  <symbol id="i-fwd10" viewBox="0 0 48 48"><path d="M32 12.500A15 15 0 1 0 39 24" fill="none"/><path d="m31.500 5.500 1 7.500-7.500-1"/><text x="24" y="30" text-anchor="middle" font-size="14" font-weight="700" fill="currentColor" stroke="none" font-family="Plus Jakarta Sans, sans-serif">10</text></symbol>
+</svg>
+
+<div class="welcome" id="nameDlg" role="dialog" aria-modal="true" aria-labelledby="nameTtl" hidden>
+  <form class="wcard" id="nameForm">
+    <svg class="wlogo" viewBox="0 0 100 107" aria-hidden="true">
+      <defs><linearGradient id="sg" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="107"><stop offset="0" stop-color="#FFCEEE"/><stop offset="1" stop-color="#FF46B2"/></linearGradient></defs>
+      <circle cx="59.500" cy="12.100" r="12.100" fill="url(#sg)"/>
+      <rect x="28.500" y="27.300" width="53.300" height="21.200" rx="10.600" fill="url(#sg)"/>
+      <rect x="12.100" y="52.600" width="68.900" height="21.900" rx="11" fill="url(#sg)"/>
+      <rect x="0" y="79.100" width="100" height="27.700" rx="13.900" fill="url(#sg)"/>
+    </svg>
+    <h2 id="nameTtl">What should we call you?</h2>
+    <p id="nameSub">Your name stays on this device.</p>
+    <input id="nameInput" maxlength="24" autocomplete="off" placeholder="Your name" aria-label="Your name">
+    <button class="btn" id="nameSave" type="submit">Continue</button>
+    <button class="linkbtn" id="nameCancel" type="button" hidden>Cancel</button>
+  </form>
+</div>
+<div class="menu" id="menu" role="menu" hidden><button type="button" role="menuitem" id="menuReveal"><svg class="i"><use href="#i-folder"/></svg><span id="menuLbl"></span></button></div>
+<div class="toast" id="toast" role="status" hidden></div>
+<div class="drag" aria-hidden="true"></div>
+<main class="app">
+
+  <!-- Home -->
+  <section class="screen" id="home">
+    <div class="top">
+      <button class="round plain" aria-label="Menu"><svg class="i"><use href="#i-menu"/></svg></button>
+      <button class="round dark" id="profileBtn" aria-label="Change your name" type="button"><svg class="i"><use href="#i-user"/></svg></button>
+    </div>
+    <p class="hello" id="hello">Welcome back</p>
+    <h1>What do you want to download?</h1>
+    <img class="hero" src="assets/hero.png" alt="Person with headphones relaxing in an armchair">
+    <form class="paste" id="pasteForm">
+      <svg class="i"><use href="#i-link"/></svg>
+      <input id="link" type="url" inputmode="url" placeholder="Paste a link here" aria-label="Link to download" autocomplete="off">
+      <button class="btn" id="goBtn" type="submit"><span id="goLbl">Get link</span> <svg class="i"><use href="#i-right"/></svg></button>
+    </form>
+    <div class="seg" id="homeSeg" role="group" aria-label="What to download"><button type="button" data-m="audio">Audio only</button><button type="button" data-m="video">Video</button><button type="button" data-m="both">Video + audio files</button></div>
+    <p class="hint" id="modeHint"></p>
+    <div class="chips">
+      <button class="chip" id="chipBest" aria-pressed="false" type="button"><svg class="i"><use href="#i-star"/></svg>Best quality</button>
+      <button class="chip" id="chipNow" aria-pressed="false" type="button"><svg class="i"><use href="#i-bolt"/></svg>Skip preview</button>
+    </div>
+    <div class="setup" id="setup" hidden><span id="setupTxt"></span> <button class="btn small" id="setupBtn" type="button" hidden>Install now</button></div>
+    <div class="sec"><h2>Recent</h2><button type="button" data-go="library">See all <svg class="i"><use href="#i-right"/></svg></button></div>
+    <div class="list" id="recent"></div>
+    <button class="chai-card" type="button" data-go="support"><svg class="cup s" viewBox="0 0 48 52" aria-hidden="true"><g class="steam" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M17 4c-3 4 3 6 0 10"/><path d="M25 2c-3 4 3 7 0 11"/><path d="M33 4c-3 4 3 6 0 10"/></g><path d="M8 22h30v9a12 12 0 0 1-12 12h-6A12 12 0 0 1 8 31z" fill="currentColor"/><path d="M38 25h2.500a5.500 5.500 0 0 1 0 11H37" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><rect x="12" y="46" width="22" height="3.500" rx="1.800" fill="currentColor" opacity=".35"/></svg><span><b>Enjoying Soundcairn?</b><small>Buy me a chai</small></span><svg class="i"><use href="#i-right"/></svg></button>
+  </section>
+
+  <!-- Preview -->
+  <section class="screen" id="preview" hidden>
+    <div class="top">
+      <button class="round ghost" data-go="home" aria-label="Back"><svg class="i"><use href="#i-back"/></svg></button>
+      <button class="round ghost" id="pvMore" aria-label="More" aria-haspopup="menu"><svg class="i"><use href="#i-dots"/></svg></button>
+    </div>
+    <div class="cover">
+      <img id="pvCover" alt="">
+      <span class="badge"><svg class="i"><use href="#i-clock"/></svg><span id="pvDur"></span></span>
+    </div>
+    <h1 id="pvTitle"></h1>
+    <div class="by"><span class="round"><svg class="i"><use href="#i-user"/></svg></span><span id="pvBy"></span></div>
+    <div class="sheet">
+      <div class="handle"></div>
+      <div class="seg" id="seg" role="group" aria-label="Type"><button type="button" data-m="audio">Audio</button><button type="button" data-m="video">Video</button><button type="button" data-m="both">Both</button></div>
+      <h2>Choose quality</h2>
+      <div class="opts" id="opts" role="radiogroup" aria-label="Quality"></div>
+      <div class="cov">
+        <span class="ic"><svg class="i"><use href="#i-image"/></svg></span>
+        <span class="lbl" id="covLbl">Also save cover image</span>
+        <button class="sw" id="swCover" role="switch" aria-checked="true" aria-labelledby="covLbl" type="button"></button>
+      </div>
+      <div class="cov where">
+        <span class="ic"><svg class="i"><use href="#i-folder"/></svg></span>
+        <span class="lbl"><small>Save to</small><span id="whereLbl"></span></span>
+        <button class="btn small alt" id="wherePick" type="button">Change</button>
+      </div>
+      <button class="btn" id="startBtn" type="button">Download</button>
+    </div>
+  </section>
+
+  <!-- Downloading -->
+  <section class="screen" id="downloads" hidden>
+    <div class="head">
+      <button class="round plain" data-go="home" aria-label="Back"><svg class="i"><use href="#i-back"/></svg></button>
+      <h3 id="dlHead">Downloading...</h3><span></span>
+    </div>
+    <div class="ringwrap">
+      <svg viewBox="0 0 224 224" aria-hidden="true">
+        <circle cx="112" cy="112" r="96" stroke="var(--pink-track)"/>
+        <circle id="ring" cx="112" cy="112" r="96" stroke="var(--ink)" stroke-linecap="round" stroke-dasharray="603.2" stroke-dashoffset="603.2"/>
+      </svg>
+      <div class="pct"><span id="pct">0</span><small>%</small></div>
+    </div>
+    <div class="dlt" id="dlTitle"></div>
+    <div class="sub" id="dlSize"></div>
+    <div class="spd" id="dlSpeed"></div>
+    <div class="ctrls">
+      <button class="ctrl" id="pauseBtn" type="button"><span class="c fill"><svg class="i" id="pauseIcon"><use href="#i-pause"/></svg></span><span id="pauseLbl">Pause</span></button>
+      <button class="ctrl" id="cancelBtn" type="button"><span class="c"><svg class="i"><use href="#i-x"/></svg></span>Cancel</button>
+    </div>
+    <div class="card"><h2>All downloads</h2><div class="list" id="queue"></div></div>
+  </section>
+
+  <!-- Library -->
+  <section class="screen" id="library" hidden>
+    <div class="top"><h1 style="margin:0">Library</h1></div>
+    <div class="list" id="libList" style="margin-top:20px"></div>
+  </section>
+
+  <!-- Settings -->
+  <section class="screen" id="settings" hidden>
+    <div class="top"><h1 style="margin:0">Settings</h1></div>
+    <div class="set"><div class="lbl"><b>Saved to</b><span id="setFolder"></span></div><button class="btn small alt" id="setOpen" type="button">Open</button><button class="btn small" id="setPick" type="button">Change</button></div>
+    <div class="set"><div class="lbl"><b>Tools</b><span id="setTools"></span></div><button class="btn small alt" id="setToolsOpen" type="button">Open folder</button></div>
+    <div class="set"><div class="lbl"><b>Buy me a chai</b><span>Soundcairn is free. Say thanks for 8 rupees.</span></div><button class="btn small" type="button" data-go="support">Support</button></div>
+    <p class="credit">Soundcairn · Made by Afif aka Enkidu</p>
+  </section>
+
+  <!-- Support -->
+  <section class="screen" id="support" hidden>
+    <div class="head">
+      <button class="round plain" data-go="home" aria-label="Back"><svg class="i"><use href="#i-back"/></svg></button>
+      <h3>Buy me a chai</h3><span></span>
+    </div>
+    <div class="chai-hero"><svg class="cup l" viewBox="0 0 48 52" aria-hidden="true"><g class="steam" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M17 4c-3 4 3 6 0 10"/><path d="M25 2c-3 4 3 7 0 11"/><path d="M33 4c-3 4 3 6 0 10"/></g><path d="M8 22h30v9a12 12 0 0 1-12 12h-6A12 12 0 0 1 8 31z" fill="currentColor"/><path d="M38 25h2.500a5.500 5.500 0 0 1 0 11H37" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><rect x="12" y="46" width="22" height="3.500" rx="1.800" fill="currentColor" opacity=".35"/></svg></div>
+    <p class="sup-lead">Soundcairn is free and made by one person. A cup of chai keeps it going.</p>
+    <div class="opts chai" id="chaiOpts" role="radiogroup" aria-label="Chai size"></div>
+    <div class="pay" id="payBox"></div>
+  </section>
+
+  <!-- Player -->
+  <section class="screen" id="player" hidden>
+    <div class="head">
+      <button class="round plain" data-go="home" aria-label="Back"><svg class="i"><use href="#i-back"/></svg></button>
+      <h3 id="plHead" style="font-size:20px"></h3>
+      <button class="round plain" id="plMore" aria-label="More" aria-haspopup="menu"><svg class="i"><use href="#i-dots"/></svg></button>
+    </div>
+    <video id="media" playsinline></video>
+    <div class="orbwrap">
+      <div class="orb">
+        <svg viewBox="0 0 250 76" preserveAspectRatio="none" fill="none" stroke="#fff" stroke-width="1" aria-hidden="true" id="wave"></svg>
+      </div>
+      <svg class="spark" viewBox="0 0 54 44" fill="none" aria-hidden="true"><path d="M8 30 18 22M20 12l8-6M36 22l12-2"/></svg>
+    </div>
+    <h2 class="ptitle" id="plTitle"></h2>
+    <div class="psub" id="plSub"></div>
+    <div class="scrub"><span id="tNow">0:00</span><div class="bars" id="bars" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="100"></div><span id="tEnd"></span></div>
+    <div class="pc">
+      <button class="skip" id="back10" aria-label="Back 10 seconds" type="button"><svg class="i"><use href="#i-back10"/></svg></button>
+      <button class="play" id="playBtn" aria-label="Pause" type="button"><svg class="i" id="playIcon"><use href="#i-pause"/></svg></button>
+      <button class="skip" id="fwd10" aria-label="Forward 10 seconds" type="button"><svg class="i"><use href="#i-fwd10"/></svg></button>
+    </div>
+    <div class="mini">
+      <button id="speedBtn" type="button" aria-label="Playback speed">1x</button>
+      <button id="sleepBtn" type="button" aria-label="Sleep timer" aria-pressed="false"><svg class="i"><use href="#i-timer"/></svg><span id="sleepLbl"></span></button>
+    </div>
+  </section>
+
+  <nav class="tabs" id="tabs" aria-label="Main">
+    <span class="pill" id="pill" aria-hidden="true"></span>
+    <button class="tab on" id="tab-home" data-go="home" aria-label="Home"><svg class="i"><use href="#i-home"/></svg></button>
+    <button class="tab" id="tab-downloads" data-go="downloads" aria-label="Downloads"><svg class="i"><use href="#i-down"/></svg></button>
+    <button class="tab" id="tab-library" data-go="library" aria-label="Library"><svg class="i"><use href="#i-lib"/></svg></button>
+    <button class="tab" id="tab-settings" data-go="settings" aria-label="Settings"><svg class="i"><use href="#i-gear"/></svg></button>
+  </nav>
+</main>
+
+<script src="donate.js"></script>
+<script src="vendor/qrcode.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmt = s => { s = Math.floor(s || 0); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60;
+  return (h ? h + ":" + String(m).padStart(2, "0") : m) + ":" + String(x).padStart(2, "0"); };
+const size = b => !b ? "?" : b >= 1e9 ? (b / 1e9).toFixed(1) + " GB" : Math.max(1, Math.round(b / 1e6)) + " MB";
+const mins = s => !s ? "" : s >= 60 ? Math.round(s / 60) + " min" : Math.round(s) + " sec";
+const icon = n => `<svg class="i"><use href="#i-${n}"/></svg>`;
+const MODE_HINT = { audio: "Just the sound, saved as an audio file.", video: "A normal video, with its sound.", both: "A video file and a separate audio file." };
+const MODE_NAME = { audio: "Audio", video: "Video" };
+// The qualities this video really offers, and the one picked: the user's click, else Best, else Full HD (or the top audio stream).
+const optionsFor = p => st.mode === "audio" ? p.audio : p.video;
+function chosen(p) {
+  const list = optionsFor(p);
+  if (list.some(o => o.key === st.quality)) return st.quality;
+  if (st.wantBest || st.mode === "audio") return list[0].key;
+  return (list.find(o => o.height <= 1080) || list[0]).key;
+}
+
+const st = { prev: null, mode: "audio", quality: "", wantBest: false, cover: true, jobs: [], focus: null, lib: [] };
+let cur = "home", toastTimer;
+
+function toast(text) {
+  const t = $("toast"); t.textContent = text; t.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.hidden = true, 5000);
+}
+
+// Navigation: the incoming screen slides in from the side you are heading to.
+const ORDER = ["home", "preview", "downloads", "library", "settings", "player", "support"];
+const TABBED = ["home", "downloads", "library", "settings"];
+function show(name) {
+  const dir = ORDER.indexOf(name) >= ORDER.indexOf(cur) ? "fwd" : "back";
+  ORDER.forEach(s => $(s).hidden = s !== name);
+  $("tabs").hidden = !TABBED.includes(name);
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("on", t.id === "tab-" + name));
+  const el = $(name);
+  [...el.children].forEach((c, i) => c.style.setProperty("--i", i));
+  el.classList.remove("in-fwd", "in-back"); void el.offsetWidth; el.classList.add("in-" + dir);
+  movePill();
+  if (name !== "player") $("media").pause();
+  cur = name;
+  if (name === "downloads") renderDownloads();
+  if (name === "settings") renderSettings();
+  if (name === "support") renderSupport();
+  el.scrollTop = 0;
+}
+function movePill() {
+  const on = document.querySelector(".tab.on"), pill = $("pill");
+  if (!on || $("tabs").hidden) return;
+  const r = on.getBoundingClientRect(), n = $("tabs").getBoundingClientRect();
+  pill.style.width = r.width + "px"; pill.style.height = r.height + "px";
+  pill.style.transform = `translate(${r.left - n.left}px, ${r.top - n.top}px)`;
+}
+window.addEventListener("resize", movePill);
+// Android back button: step out to Home, or tell the app to close when already there.
+window.__back = () => { if (!$("nameDlg").hidden) { closeName(); return true; } if (cur === "home") return false; if (!$("menu").hidden) $("menu").hidden = true; else show("home"); return true; };
+document.addEventListener("click", e => { const b = e.target.closest("[data-go]"); if (b) show(b.dataset.go); });
+
+// Library lists
+function rowHtml(it, n) {
+  const art = it.thumb ? `<img src="${esc(it.thumb)}" alt="">` : `<div class="ph">${icon(it.kind === "video" ? "play" : "lib")}</div>`;
+  return `<div class="row" style="--n:${n}" data-play="${st.lib.indexOf(it)}">${art}<div class="t"><b>${esc(it.title)}</b><span>${it.kind === "video" ? "Video" : "Audio"} · ${size(it.size)}</span></div><button class="go" aria-label="Play ${esc(it.title)}" type="button">${icon("play")}</button></div>`;
+}
+const EMPTY = `<div class="empty">Nothing here yet. Paste a link on Home to get started.</div>`;
+async function loadLibrary() {
+  st.lib = await api.library();
+  $("recent").innerHTML = st.lib.length ? st.lib.slice(0, 4).map(rowHtml).join("") : EMPTY;
+  $("libList").innerHTML = st.lib.length ? st.lib.map(rowHtml).join("") : EMPTY;
+}
+document.addEventListener("click", e => { const r = e.target.closest("[data-play]"); if (r) openPlayer(st.lib[+r.dataset.play]); });
+
+// Home
+function renderChips() {
+  document.querySelectorAll(".seg [data-m]").forEach(b => b.classList.toggle("on", b.dataset.m === st.mode));
+  $("modeHint").textContent = MODE_HINT[st.mode];
+  $("chipBest").classList.toggle("on", st.wantBest);
+  $("chipBest").setAttribute("aria-pressed", st.wantBest);
+}
+document.querySelectorAll(".seg").forEach(g => g.addEventListener("click", e => { const b = e.target.closest("[data-m]"); if (b && !b.disabled) { st.mode = b.dataset.m; renderChips(); if (cur === "preview") renderPreview(); } }));
+$("chipBest").addEventListener("click", () => { st.wantBest = !st.wantBest; st.quality = ""; renderChips(); });
+$("chipNow").addEventListener("click", e => { const b = e.currentTarget; b.setAttribute("aria-pressed", b.classList.toggle("on")); });
+
+$("pasteForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const url = $("link").value.trim();
+  if (!url) return $("link").focus();
+  $("goBtn").disabled = true; $("goLbl").textContent = "Looking...";
+  const r = await api.probe(url);
+  $("goBtn").disabled = false; $("goLbl").textContent = "Get link";
+  if (r.error) return toast(r.error);
+  st.prev = r;
+  if (!r.hasVideo) st.mode = "audio";
+  renderChips();
+  if ($("chipNow").classList.contains("on")) return begin();
+  renderPreview(); show("preview");
+});
+
+// Preview
+function renderPreview() {
+  const p = st.prev, img = $("pvCover");
+  img.classList.remove("ready"); img.onload = () => img.classList.add("ready"); img.src = p.thumb;
+  $("pvTitle").textContent = p.title; $("pvBy").textContent = p.by; $("pvDur").textContent = mins(p.secs) || "Live";
+  document.querySelectorAll("#seg button").forEach(b => { b.classList.toggle("on", b.dataset.m === st.mode); b.disabled = b.dataset.m !== "audio" && !p.hasVideo; });
+  const list = optionsFor(p), pick = chosen(p), extra = st.mode === "both" ? p.audio[0].bytes : 0;
+  $("opts").classList.toggle("dense", list.length > 4);
+  $("opts").innerHTML = list.map(o => `<button class="opt${o.key === pick ? " on" : ""}" role="radio" aria-checked="${o.key === pick}" data-q="${esc(o.key)}" type="button"><span class="rd">${icon("check")}</span><span class="tx"><b>${esc(o.label)}</b><span>${esc(o.note)}${st.mode === "both" ? " + audio file" : ""}</span></span><span class="sz">${size(o.bytes + extra)}</span></button>`).join("");
+  api.tools().then(t => $("whereLbl").textContent = t.folder.replace(/^\/Users\/[^/]+/, "~"));
+  $("startBtn").textContent = { audio: "Download audio", video: "Download video", both: "Download video + audio" }[st.mode];
+}
+$("opts").addEventListener("click", e => { const b = e.target.closest("[data-q]"); if (b) { st.quality = b.dataset.q; renderChips(); renderPreview(); } });
+$("swCover").addEventListener("click", e => { st.cover = e.currentTarget.getAttribute("aria-checked") !== "true"; e.currentTarget.setAttribute("aria-checked", st.cover); });
+$("startBtn").addEventListener("click", begin);
+$("wherePick").addEventListener("click", async () => { $("whereLbl").textContent = (await api.pickFolder()).replace(/^\/Users\/[^/]+/, "~"); loadLibrary(); });
+
+// Downloads
+async function begin() {
+  const p = st.prev, key = chosen(p);
+  // "Both" is two downloads: the video file, then a separate audio file (best m4a).
+  const plan = st.mode === "both" ? [["video", key, p.video.find(o => o.key === key).bytes, st.cover], ["audio", "best", p.audio[0].bytes, false]]
+    : [[st.mode, key, optionsFor(p).find(o => o.key === key).bytes, st.cover]];
+  for (const [mode, quality, expected, cover] of plan) {
+    const r = await api.start({ url: p.url, mode, quality, cover, expected });
+    if (r.error) return toast(r.error);
+    st.jobs.unshift({ id: r.id, title: p.title, thumb: p.thumb, mode, state: "running", got: 0, total: expected, pct: 0, speed: 0 });
+    st.focus = r.id;
+  }
+  $("link").value = "";
+  show("downloads");
+}
+api.onDownload(m => {
+  const j = st.jobs.find(x => x.id === m.id);
+  if (!j) return;
+  if (m.type === "progress") Object.assign(j, { got: m.got, total: m.total, pct: m.pct, speed: m.speed, state: "running" });
+  if (m.type === "done") { j.state = "done"; j.pct = 1; j.file = m.path; loadLibrary(); }
+  if (m.type === "error") { j.state = "error"; toast(m.message); }
+  if (cur === "downloads") renderDownloads();
+});
+const STATE = { running: "Downloading...", paused: "Paused", done: "Done", error: "Failed" };
+function renderDownloads() {
+  const j = st.jobs.find(x => x.id === st.focus) || null;
+  $("ring").style.strokeDashoffset = 603.2 * (1 - (j ? j.pct : 0));
+  $("pct").textContent = j ? Math.round(j.pct * 100) : 0;
+  $("ring").closest(".ringwrap").classList.toggle("done", !!j && j.state === "done");
+  $("dlHead").textContent = !j ? "Downloads" : j.state === "running" && j.pct >= .99 ? "Finishing..." : STATE[j.state];
+  $("dlTitle").textContent = j ? `${MODE_NAME[j.mode]} · ${j.title}` : "";
+  $("dlSize").textContent = j ? `${size(j.got)} of ${size(j.total)}` : "Nothing downloading";
+  $("dlSpeed").innerHTML = j && j.state === "running" && j.speed ? `${icon("bolt")} ${(j.speed / 1e6).toFixed(1)} MB/s` : "";
+  $("pauseBtn").hidden = !j; $("cancelBtn").hidden = !j || j.state === "done";
+  const play = j && j.state !== "running";
+  $("pauseIcon").innerHTML = `<use href="#i-${play ? "play" : "pause"}"/>`;
+  $("pauseLbl").textContent = !j || j.state === "running" ? "Pause" : j.state === "done" ? "Play" : j.state === "paused" ? "Resume" : "Retry";
+  const others = st.jobs.filter(x => x !== j);
+  $("queue").innerHTML = others.length ? others.map((x, n) => `<div class="row" style="--n:${n}" data-focus="${x.id}">${x.thumb ? `<img src="${esc(x.thumb)}" alt="">` : `<div class="ph">${icon("down")}</div>`}<div class="t"><b>${esc(x.title)}</b><span>${MODE_NAME[x.mode]} · ${STATE[x.state]}</span><div class="bar"><i style="width:${Math.round(x.pct * 100)}%"></i></div></div></div>`).join("") : `<div class="empty">No other downloads.</div>`;
+}
+document.addEventListener("click", e => { const r = e.target.closest("[data-focus]"); if (r) { st.focus = +r.dataset.focus; renderDownloads(); } });
+$("pauseBtn").addEventListener("click", () => {
+  const j = st.jobs.find(x => x.id === st.focus); if (!j) return;
+  if (j.state === "done") { const it = st.lib.find(l => l.path === j.file); return it ? openPlayer(it) : null; }
+  if (j.state === "running") { api.pause(j.id); j.state = "paused"; } else { api.resume(j.id); j.state = "running"; }
+  renderDownloads();
+});
+$("cancelBtn").addEventListener("click", () => {
+  const j = st.jobs.find(x => x.id === st.focus); if (!j) return;
+  api.cancel(j.id); st.jobs = st.jobs.filter(x => x !== j);
+  st.focus = st.jobs.length ? st.jobs[0].id : null;
+  if (st.focus) renderDownloads(); else show("home");
+});
+
+// Player: one <video> element plays both audio and video files.
+const media = $("media"), BARS = 44;
+$("bars").innerHTML = Array.from({ length: BARS }, (_, i) => `<i style="height:${10 + Math.round(36 * Math.abs(Math.sin(i * 1.3) * Math.cos(i * .45)))}px"></i>`).join("");
+$("wave").innerHTML = Array.from({ length: 9 }, (_, k) => {
+  let d = ""; for (let x = 0; x <= 250; x += 5) { const y = 38 + Math.sin(x / 22 + k * .25) * (22 - k * 1.6) * Math.exp(-Math.pow((x - 90 - k * 6) / 70, 2)) + Math.sin(x / 9) * 2; d += (x ? "L" : "M") + x + " " + y.toFixed(1); }
+  return `<path d="${d}" opacity="${.85 - k * .07}"/>`;
+}).join("");
+const sleep = { mins: 0, at: 0 };
+function openPlayer(it) {
+  st.playing = it;
+  $("player").classList.toggle("isvideo", it.kind === "video");
+  media.src = it.url; media.playbackRate = 1; sleep.mins = 0; renderSleep();
+  $("plHead").textContent = it.kind === "video" ? "Video" : "Now playing"; $("plTitle").textContent = it.title;
+  $("plSub").textContent = `${it.kind === "video" ? "Video" : "Audio"} · ${size(it.size)}`;
+  $("tNow").textContent = "0:00"; $("tEnd").textContent = "0:00"; $("speedBtn").textContent = "1x";
+  show("player"); media.play().catch(() => {}); renderPlayer();
+}
+function renderPlayer() {
+  const L = media.duration || 0, f = L ? media.currentTime / L : 0;
+  $("tNow").textContent = fmt(media.currentTime); $("tEnd").textContent = fmt(L);
+  $("bars").setAttribute("aria-valuenow", Math.round(f * 100));
+  [...$("bars").children].forEach((b, i) => b.classList.toggle("d", i < Math.round(f * BARS)));
+}
+function renderSleep() { $("sleepBtn").setAttribute("aria-pressed", !!sleep.mins); $("sleepBtn").classList.toggle("on", !!sleep.mins); $("sleepLbl").textContent = sleep.mins ? sleep.mins + "m" : ""; }
+media.addEventListener("timeupdate", () => {
+  renderPlayer();
+  if (sleep.mins && media.currentTime >= sleep.at) { sleep.mins = 0; renderSleep(); media.pause(); }
+});
+media.addEventListener("loadedmetadata", renderPlayer);
+["play", "pause", "ended"].forEach(ev => media.addEventListener(ev, () => {
+  const on = !media.paused && !media.ended;
+  $("player").classList.toggle("playing", on);
+  $("playIcon").innerHTML = `<use href="#i-${on ? "pause" : "play"}"/>`;
+  $("playBtn").setAttribute("aria-label", on ? "Pause" : "Play");
+}));
+$("playBtn").addEventListener("click", () => { if (media.paused) media.play(); else media.pause(); });
+$("back10").addEventListener("click", () => { media.currentTime = Math.max(0, media.currentTime - 10); });
+$("fwd10").addEventListener("click", () => { media.currentTime = Math.min(media.duration || 0, media.currentTime + 10); });
+$("speedBtn").addEventListener("click", e => { const S = [1, 1.25, 1.5, 2]; media.playbackRate = S[(S.indexOf(media.playbackRate) + 1) % S.length]; e.currentTarget.textContent = media.playbackRate + "x"; });
+$("sleepBtn").addEventListener("click", () => { const O = [0, 15, 30, 60]; sleep.mins = O[(O.indexOf(sleep.mins) + 1) % O.length]; sleep.at = media.currentTime + sleep.mins * 60; renderSleep(); });
+$("bars").addEventListener("click", e => { const r = e.currentTarget.getBoundingClientRect(); media.currentTime = (e.clientX - r.left) / r.width * (media.duration || 0); });
+$("bars").addEventListener("keydown", e => { if (e.key === "ArrowRight") media.currentTime += 10; if (e.key === "ArrowLeft") media.currentTime -= 10; });
+
+// Three-dots menu: reveal the file (or the save folder) in the system file manager.
+let platform = "", menuFile = "";
+const REVEAL = { darwin: "Show in Finder", win32: "Show in File Explorer", android: "Save a copy to Downloads" };
+function openMenu(btn, file) {
+  menuFile = file || "";
+  $("menuLbl").textContent = (REVEAL[platform] || "Show in file manager") + (file ? "" : " (save folder)");
+  const m = $("menu"), r = btn.getBoundingClientRect();
+  m.hidden = false; m.style.top = r.bottom + 8 + "px"; m.style.right = Math.max(12, window.innerWidth - r.right) + "px";
+}
+const closeMenu = () => { $("menu").hidden = true; };
+$("plMore").addEventListener("click", e => { e.stopPropagation(); $("menu").hidden ? openMenu(e.currentTarget, st.playing && st.playing.path) : closeMenu(); });
+$("pvMore").addEventListener("click", e => { e.stopPropagation(); $("menu").hidden ? openMenu(e.currentTarget, "") : closeMenu(); });
+$("menuReveal").addEventListener("click", async () => { closeMenu(); const r = await api.reveal(menuFile); if (r && r.message) toast(r.message); });
+document.addEventListener("click", closeMenu);
+document.addEventListener("keydown", e => { if (e.key === "Escape") { closeMenu(); closeName(); } });
+
+// Name: asked on first launch, changed from the profile button. Stored on this device only.
+const NAME_KEY = "soundcairn.name";
+const getName = () => { try { return localStorage.getItem(NAME_KEY) || ""; } catch { return ""; } };
+function renderName() {
+  const h = $("hello"), nm = document.createElement("span");
+  nm.className = "nm"; nm.textContent = getName() || "friend";
+  h.textContent = "Welcome back, "; h.append(nm);
+}
+function closeDialog() {
+  const d = $("nameDlg"); d.classList.add("leaving");
+  setTimeout(() => { d.hidden = true; d.classList.remove("leaving"); }, 350);
+}
+function askName(edit) {
+  const input = $("nameInput");
+  input.value = getName();
+  $("nameTtl").textContent = edit ? "Change your name" : "What should we call you?";
+  $("nameSub").textContent = edit ? "This is how we greet you." : "Your name stays on this device.";
+  $("nameCancel").hidden = !edit; $("nameSave").disabled = !input.value.trim(); $("nameDlg").hidden = false;
+  setTimeout(() => { input.focus(); input.select(); }, 80);
+}
+const closeName = () => { if (!$("nameCancel").hidden) closeDialog(); };
+$("nameInput").addEventListener("input", e => { $("nameSave").disabled = !e.target.value.trim(); });
+$("nameForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const name = $("nameInput").value.trim(); if (!name) return;
+  try { localStorage.setItem(NAME_KEY, name); } catch {}
+  renderName(); closeDialog();
+});
+$("nameCancel").addEventListener("click", closeName);
+$("profileBtn").addEventListener("click", () => askName(true));
+
+// Buy me a chai: a UPI payment. On a phone the button opens the UPI app, on a computer a QR code is shown to scan.
+// The ID and amounts live in donate.js. With the ID empty the screen says donations are not on yet.
+const MAX_UPI = 100000;
+let chai = "s", custom = 50;
+const CUP = k => `<svg class="cup ${k}" viewBox="0 0 48 52" aria-hidden="true"><g class="steam" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M17 4c-3 4 3 6 0 10"/><path d="M25 2c-3 4 3 7 0 11"/><path d="M33 4c-3 4 3 6 0 10"/></g><path d="M8 22h30v9a12 12 0 0 1-12 12h-6A12 12 0 0 1 8 31z" fill="currentColor"/><path d="M38 25h2.500a5.500 5.500 0 0 1 0 11H37" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><rect x="12" y="46" width="22" height="3.500" rx="1.800" fill="currentColor" opacity=".35"/></svg>`;
+const ART = {
+  s: CUP("s"), l: CUP("l"),
+  c: `<svg class="cup c" viewBox="0 0 48 52" aria-hidden="true"><g class="steam" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M17 4c-3 4 3 6 0 10"/><path d="M25 2c-3 4 3 7 0 11"/><path d="M33 4c-3 4 3 6 0 10"/></g><path d="M6 20h34v10a13 13 0 0 1-13 13h-8A13 13 0 0 1 6 30z" fill="#7A4A2B"/><path d="M40 24h2a6 6 0 0 1 0 12h-3" fill="none" stroke="#7A4A2B" stroke-width="3" stroke-linecap="round"/><rect x="9" y="46" width="28" height="3.500" rx="1.800" fill="currentColor" opacity=".35"/></svg>`,
+  m: `<svg class="cup m" viewBox="0 0 48 52" aria-hidden="true"><g class="steam" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M17 6c-3 4 3 6 0 10"/><path d="M25 4c-3 4 3 7 0 11"/><path d="M33 6c-3 4 3 6 0 10"/></g><path d="M4 24h40a20 20 0 0 1-20 20A20 20 0 0 1 4 24z" fill="currentColor"/><rect x="12" y="46" width="24" height="3.500" rx="1.800" fill="currentColor" opacity=".35"/></svg>`,
+  h: `<svg class="cup h" viewBox="0 0 48 52" aria-hidden="true"><path d="M24 44S6 33 6 20a9 9 0 0 1 18-3 9 9 0 0 1 18 3c0 13-18 24-18 24z" fill="#FF46B2"/></svg>`,
+};
+const upiLink = amount => `upi://pay?pa=${encodeURIComponent(DONATE.upi)}&pn=${encodeURIComponent(DONATE.name)}&am=${amount}&cu=INR&tn=${encodeURIComponent("Chai for Soundcairn")}`;
+const amountNow = () => chai === "x" ? Math.floor(custom) : DONATE.tiers.find(x => x.key === chai).amount;
+function renderSupport() {
+  $("chaiOpts").innerHTML = DONATE.tiers.map(x => `<button class="opt${x.key === chai ? " on" : ""}" role="radio" aria-checked="${x.key === chai}" data-chai="${x.key}" type="button">${ART[x.key]}<span class="tx"><b>${x.label}</b><span>${x.note}</span></span><span class="sz">₹${x.amount}</span></button>`).join("")
+    + `<div class="opt custom${chai === "x" ? " on" : ""}" role="radio" aria-checked="${chai === "x"}" data-chai="x">${ART.h}<span class="tx"><b>Any amount</b><span>Your choice</span></span><label class="amt">₹<input id="customAmt" type="number" min="1" max="${MAX_UPI}" step="1" inputmode="numeric" value="${custom}" aria-label="Amount in rupees"></label></div>`;
+  renderPay();
+}
+function renderPay() {
+  const amount = amountNow(), pay = $("payBox");
+  pay.style.animation = "none"; void pay.offsetWidth; pay.style.animation = "";
+  if (!DONATE.upi) { pay.innerHTML = `<p class="sup-note">Chai donations are not switched on yet.</p>`; return; }
+  if (!(amount >= 1 && amount <= MAX_UPI)) { pay.innerHTML = `<p class="sup-note">Enter an amount from 1 to ${MAX_UPI.toLocaleString("en-IN")}.</p>`; return; }
+  if (platform === "android") { pay.innerHTML = `<a class="btn" href="${upiLink(amount)}">Pay ₹${amount} with UPI</a><small>Opens your UPI app</small>`; return; }
+  const qr = qrcode(0, "M"); qr.addData(upiLink(amount)); qr.make();
+  pay.innerHTML = `<div class="qrbox">${qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true })}</div><small>Scan with any UPI app to pay ₹${amount}</small><button class="btn small alt upi" id="copyUpi" type="button">${DONATE.upi}</button>`;
+}
+$("chaiOpts").addEventListener("click", e => {
+  const b = e.target.closest("[data-chai]");
+  if (!b || b.dataset.chai === chai) return;
+  chai = b.dataset.chai; renderSupport();
+  if (chai === "x") $("customAmt").focus();
+});
+$("chaiOpts").addEventListener("input", e => { if (e.target.id === "customAmt") { custom = Number(e.target.value); renderPay(); } });
+$("payBox").addEventListener("click", async e => {
+  if (!e.target.closest("#copyUpi")) return;
+  try { await navigator.clipboard.writeText(DONATE.upi); toast("UPI ID copied"); } catch { toast(DONATE.upi); }
+});
+
+// Settings
+async function renderSettings() {
+  const t = await api.tools(), mark = (ok, n) => `${ok ? "✓" : "✗"} ${n}`;
+  $("setFolder").textContent = t.folder;
+  $("setTools").textContent = [mark(t.ytdlp, "yt-dlp"), mark(t.ffmpeg, "ffmpeg"), mark(t.ffprobe, "ffprobe")].join("   ") + (t.ytdlp && t.ffmpeg && t.ffprobe ? "" : `\nPut the missing ones in ${t.toolsDir}`);
+  $("setTools").style.whiteSpace = "pre-line";
+}
+$("setupBtn").addEventListener("click", async () => {
+  const b = $("setupBtn"); b.disabled = true; b.textContent = "Downloading...";
+  const r = await api.installTools();
+  if (r.error) { b.disabled = false; b.textContent = "Try again"; return toast(r.error); }
+  $("setup").hidden = true; toast("Ready. Paste a link to start.");
+});
+$("setPick").addEventListener("click", async () => { await api.pickFolder(); renderSettings(); loadLibrary(); });
+$("setOpen").addEventListener("click", () => api.openFolder());
+$("setToolsOpen").addEventListener("click", () => api.openToolsFolder());
+
+(async () => {
+  const t = await api.tools(); platform = t.platform; if (["darwin", "win32"].includes(platform)) document.documentElement.classList.add("frameless"); const missing = [!t.ytdlp && "yt-dlp", !t.ffmpeg && "ffmpeg", !t.ffprobe && "ffprobe"].filter(Boolean);
+  if (missing.length) {
+    $("setup").hidden = false; $("setupBtn").hidden = !t.canInstall;
+    $("setupTxt").textContent = t.canInstall ? `First run: ${missing.join(", ")} need to be downloaded once.` : `Missing: ${missing.join(", ")}. Open Settings for where to put them.`;
+  }
+  renderChips(); renderName(); show("home"); loadLibrary(); if (!getName()) askName(false);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+node_modules/
+dist/
+release/
+bin/
+*.apk
+local.properties
+.gradle/
+.kotlin/
+android/build/
+android/app/build/
+android/app/src/main/assets/
+.DS_Store
