@@ -6,7 +6,7 @@ Electron app for macOS and Windows. The screens are one HTML page (`app/index.ht
 npm install
 npm start            # run it
 npm test             # helper and donation-config tests
-npm run pack         # macOS app in dist/
+npm run dist:mac     # macOS dmg files in release/
 npm run dist:win     # Windows installer in release/
 ```
 

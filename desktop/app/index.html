@@ -849,7 +849,7 @@ $("setToolsOpen").addEventListener("click", () => api.openToolsFolder());
   const t = await api.tools(); platform = t.platform; if (["darwin", "win32"].includes(platform)) document.documentElement.classList.add("frameless"); const missing = [!t.ytdlp && "yt-dlp", !t.ffmpeg && "ffmpeg", !t.ffprobe && "ffprobe"].filter(Boolean);
   if (missing.length) {
     $("setup").hidden = false; $("setupBtn").hidden = !t.canInstall;
-    $("setupTxt").textContent = t.canInstall ? `First run: ${missing.join(", ")} need to be downloaded once.` : `Missing: ${missing.join(", ")}. Open Settings for where to put them.`;
+    $("setupTxt").textContent = t.canInstall ? `First run: ${missing.join(", ")} need to be downloaded once.` : t.platform === "darwin" ? `Missing: ${missing.join(", ")}. In Terminal run: brew install yt-dlp ffmpeg` : `Missing: ${missing.join(", ")}. Open Settings for where to put them.`;
   }
   renderChips(); renderName(); show("home"); loadLibrary(); if (!getName()) askName(false);
 })();

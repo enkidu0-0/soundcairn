@@ -14,6 +14,17 @@ A calm, friendly downloader for macOS, Windows and Android, built on [yt-dlp](ht
   <img src="docs/screenshots/home.png" width="720" alt="Home screen">
 </p>
 
+## Download
+
+Get the latest build from the [Releases page](https://github.com/enkidu0-0/soundcairn/releases/latest).
+
+| Platform | File | First-time notes |
+|---|---|---|
+| macOS (Apple silicon) | `Soundcairn-<version>-arm64.dmg` | Install yt-dlp and ffmpeg once: `brew install yt-dlp ffmpeg`. The app is unsigned, so right-click it and choose Open the first time. |
+| macOS (Intel) | `Soundcairn-<version>-x64.dmg` | Same as above. |
+| Windows 10/11 | `Soundcairn-Setup-<version>.exe` | Windows SmartScreen may warn (unsigned): choose More info, then Run anyway. The app downloads yt-dlp and ffmpeg on first run. |
+| Android 10+ (arm64) | `Soundcairn-<version>.apk` | Allow installs from your browser or file manager when asked. Nothing else to install. |
+
 ## Why Soundcairn
 
 Most downloaders drown you in formats and codes. Soundcairn shows only what the link really offers, in plain words.
@@ -32,7 +43,7 @@ Most downloaders drown you in formats and codes. Soundcairn shows only what the 
 
 ## Get it running
 
-You need [Node.js](https://nodejs.org) 20 or newer, plus **yt-dlp**, **ffmpeg** and **ffprobe** (the app looks for them next to itself, in its tools folder, and on your PATH).
+To run it from source you need [Node.js](https://nodejs.org) 20 or newer, plus **yt-dlp**, **ffmpeg** and **ffprobe** (the app looks for them next to itself, in its tools folder, and on your PATH; on a Mac `brew install yt-dlp ffmpeg` is enough).
 
 ```bash
 git clone https://github.com/enkidu0-0/soundcairn.git
@@ -44,7 +55,7 @@ npm start
 Build an app or installer:
 
 ```bash
-npm run pack        # macOS app in desktop/dist
+npm run dist:mac    # macOS dmg files in desktop/release
 npm run dist:win    # Windows installer in desktop/release
 ```
 
