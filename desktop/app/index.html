@@ -55,17 +55,16 @@ h1 { margin: 6px 0 0; font-size: 34px; line-height: 1.12; font-weight: 800; lett
 .chip.on { background: var(--pink); border-color: var(--pink); }
 .chip .dot { width: 16px; height: 16px; border-radius: 50%; background: var(--ink); }
 .chip svg.i { width: 20px; height: 20px; }
-.works { margin-top: 22px; }
-.works > p { margin: 0 0 10px; font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-.works .sites { display: flex; gap: 10px; flex-wrap: wrap; }
-.site { flex: 1 1 96px; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px 14px 14px; border-radius: 22px; background: var(--pink); text-align: left; transform: rotate(var(--tilt)); transition: transform .25s cubic-bezier(.3,1.4,.5,1), box-shadow .25s; animation: float 5s ease-in-out var(--wait) infinite; box-shadow: 0 6px 18px rgba(43,8,40,.07); }
-.site:nth-child(1) { --tilt: -2.5deg; --wait: 0s; }
-.site:nth-child(2) { --tilt: 2deg; --wait: -1.7s; background: var(--pink-soft); }
-.site:nth-child(3) { --tilt: -1.5deg; --wait: -3.3s; background: var(--card); box-shadow: 0 6px 18px rgba(43,8,40,.07), inset 0 0 0 1px var(--line); }
-.site:hover, .site:focus-visible { transform: rotate(0) scale(1.04); animation-play-state: paused; }
-.site svg { width: 30px; height: 30px; color: var(--ink); }
-.site b { font-size: 15px; font-weight: 800; }
-.site small { font-size: 12px; color: var(--ink); opacity: .65; font-weight: 600; line-height: 1.25; }
+.works { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+.works > p { margin: 0 4px 0 2px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.works .sites { display: contents; }
+.site { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 13px 0 10px; border-radius: 999px; background: var(--pink); font-weight: 700; font-size: 13px; color: var(--ink); transform: rotate(var(--tilt)); animation: pop .5s cubic-bezier(.3,1.5,.5,1) var(--wait) backwards; transition: transform .2s cubic-bezier(.3,1.5,.5,1); }
+.site:nth-child(1) { --tilt: -3deg; --wait: .1s; }
+.site:nth-child(2) { --tilt: 2deg; --wait: .2s; background: var(--pink-soft); }
+.site:nth-child(3) { --tilt: -1.500deg; --wait: .3s; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); }
+.site:hover, .site:focus-visible { transform: rotate(0) scale(1.07); }
+.site svg { width: 15px; height: 15px; fill: currentColor; flex: none; }
+@media (max-width: 520px) { .works > p { flex-basis: 100%; margin-bottom: 2px; } }
 @media (prefers-reduced-motion: reduce) { .site { animation: none; } }
 .sec { display: flex; align-items: baseline; justify-content: space-between; margin: 28px 0 12px; }
 .sec h2 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -.01em; }
@@ -420,9 +419,9 @@ h1 { margin: 6px 0 0; font-size: 34px; line-height: 1.12; font-weight: 800; lett
     <div class="works" aria-label="Sites it works with">
       <p>Works with</p>
       <div class="sites">
-        <button class="site" type="button" data-site="YouTube"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="26" height="18" rx="6"/><path d="M13 12l7 4-7 4z" fill="currentColor"/></svg><b>YouTube</b><small>Videos &amp; music, up to 8K</small></button>
-        <button class="site" type="button" data-site="Instagram"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="24" height="24" rx="8"/><circle cx="16" cy="16" r="5.500"/><circle cx="23" cy="9" r="1" fill="currentColor"/></svg><b>Instagram</b><small>Reels &amp; video posts</small></button>
-        <button class="site" type="button" data-site="Pinterest"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3c-5 0-9 3.600-9 8.200 0 3.300 2 5.300 3.800 5.300 1 0 1.600-.8 1.800-1.700.3-1.200-1.100-1.900-1.100-3.900 0-2.600 2-4.500 4.700-4.500 2.500 0 4 1.600 4 3.800 0 3.100-1.600 5.800-3.700 5.800-1.200 0-2-1-1.700-2.100"/><path d="M15 15l-3 13"/></svg><b>Pinterest</b><small>Video pins</small></button>
+        <button class="site" type="button" data-site="YouTube" title="Videos and music, up to 8K"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill-rule="evenodd" d="M7 5h18a5 5 0 0 1 5 5v12a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V10a5 5 0 0 1 5-5zM13 11v10l9-5z"/></svg>YouTube</button>
+        <button class="site" type="button" data-site="Instagram" title="Reels and video posts"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill-rule="evenodd" d="M9 3h14a6 6 0 0 1 6 6v14a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6V9a6 6 0 0 1 6-6zM16 9.500a6.500 6.500 0 1 0 0 13 6.500 6.500 0 0 0 0-13zM16 12.800a3.200 3.200 0 1 1 0 6.400 3.200 3.200 0 0 1 0-6.400zM23.500 7.300a1.500 1.500 0 1 0 0 3 1.500 1.500 0 0 0 0-3z"/></svg>Instagram</button>
+        <button class="site" type="button" data-site="Pinterest" title="Video pins"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill-rule="evenodd" d="M16 2a14 14 0 1 0 0 28 14 14 0 0 0 0-28zM16 8a4.800 4.800 0 1 0 0 9.600A4.800 4.800 0 0 0 16 8zM14.800 16.800l-1.800 8h2.600l1.600-7.200z"/></svg>Pinterest</button>
       </div>
     </div>
     <div class="setup" id="setup" hidden><span id="setupTxt"></span> <button class="btn small" id="setupBtn" type="button" hidden>Install now</button></div>
