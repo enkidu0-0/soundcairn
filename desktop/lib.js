@@ -8,7 +8,7 @@ function buildArgs({ url, mode, quality, cover, folder }) {
     "--no-playlist", "--no-warnings", "--newline", "--progress", "--progress-template", PROGRESS,
     "-P", folder, "-P", "temp:" + folder + "/.partial",
     "-o", "%(title)s [%(id)s].%(ext)s", "--trim-filenames", "120",
-    "--print", "after_move:F|%(filepath)s",
+    "--print", "after_move:F|%(filepath)s", "--playlist-items", "1",
   ];
   if (mode === "video") {
     const h = Number(quality.split(":")[1]) || 1080;
@@ -79,14 +79,19 @@ function estimate(info) {
   const shown = heights.filter(h => h >= 360);
   const video = (shown.length ? shown : heights).slice(0, 7).map(h => {
     const pick = videos.filter(f => f.height === h).sort((a, b) => bytes(b) - bytes(a))[0];
-    const name = h >= 4320 ? "8K Ultra HD" : h >= 2160 ? "4K Ultra HD" : h >= 1440 ? "2K QHD" : h >= 1080 ? "Full HD" : h >= 720 ? "HD" : "Standard";
-    return { key: "h:" + h, label: name, note: h + "p", height: h, bytes: bytes(pick) + (pick.acodec && pick.acodec !== "none" ? 0 : bestAudio) };
+    // A portrait clip (1080x1920) is 1080p: name it by its shorter side.
+    const side = Math.min(pick.width || h, h);
+    const name = side >= 4320 ? "8K Ultra HD" : side >= 2160 ? "4K Ultra HD" : side >= 1440 ? "2K QHD" : side >= 1080 ? "Full HD" : side >= 720 ? "HD" : "Standard";
+    return { key: "h:" + h, label: name, note: side + "p", height: h, bytes: bytes(pick) + (pick.acodec && pick.acodec !== "none" ? 0 : bestAudio) };
   });
   if (video.length) video[0].note += ", the best this video has";
   return { audio, video, maxHeight: heights[0] || 0, hasVideo: videos.length > 0 };
 }
 
 function toPreview(info, url) {
+  // A post with several videos (an Instagram carousel) arrives as a playlist: offer the first one.
+  const items = (info.entries || []).filter(Boolean), many = items.length;
+  if (many) info = { ...items[0], title: (info.title || items[0].title || "") + (many > 1 ? ` (first of ${many})` : ""), webpage_url: info.webpage_url };
   const e = estimate(info);
   return {
     url: info.webpage_url || url, title: info.title || "Untitled", by: info.uploader || info.channel || "",
@@ -98,6 +103,7 @@ function toPreview(info, url) {
 const cleanTitle = file => file.split(/[\\/]/).pop().replace(/\.[^.]+$/, "").replace(/\s\[[\w-]{6,}\]$/, "");
 
 const lastError = text => {
+  if (/empty media response|login required|rate-limit reached|private|--cookies/i.test(text)) return "This post needs a login (it may be private, removed, or Instagram is limiting guests). Soundcairn can't sign in yet.";
   const lines = text.split("\n").filter(l => l.startsWith("ERROR:"));
   return (lines.pop() || text.trim().split("\n").pop() || "Download failed").replace(/^ERROR:\s*(\[[^\]]+\]\s*[\w-]+:\s*)?/, "");
 };

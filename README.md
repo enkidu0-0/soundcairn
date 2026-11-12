@@ -8,6 +8,8 @@
 
 A calm, friendly downloader for macOS, Windows and Android, built on [yt-dlp](https://github.com/yt-dlp/yt-dlp).
 
+**Works with YouTube, Instagram and Pinterest** (and the other sites yt-dlp supports).
+
 </div>
 
 <p align="center">
@@ -24,6 +26,14 @@ Get the latest build from the [Releases page](https://github.com/enkidu0-0/sound
 | macOS (Intel) | `Soundcairn-<version>-x64.dmg` | Same as above. |
 | Windows 10/11 | `Soundcairn-Setup-<version>.exe` | Windows SmartScreen may warn (unsigned): choose More info, then Run anyway. The app downloads yt-dlp and ffmpeg on first run. |
 | Android 10+ (arm64) | `Soundcairn-<version>.apk` | Allow installs from your browser or file manager when asked. Nothing else to install. |
+
+## Works with
+
+| Site | What you can save | Good to know |
+|---|---|---|
+| YouTube | Videos and music, up to 8K when the video has it | Playlists are not downloaded, one video at a time |
+| Instagram | Reels and video posts | Public posts only. For a post with several videos you get the first one. Private posts and stories need a login, which Soundcairn does not have yet |
+| Pinterest | Video pins, up to 1080p | Image-only pins are not downloaded |
 
 ## Why Soundcairn
 
@@ -91,7 +101,7 @@ The page never downloads anything itself. It asks the native side to run yt-dlp,
 
 ## Project status
 
-Early release (v0.1.0). The macOS app is the one tested most. The Windows installer and the Android app are new, so expect rough edges,
+Early release (v0.1.1). The macOS app is the one tested most. The Windows installer and the Android app are new, so expect rough edges,
 and please [open an issue](https://github.com/enkidu0-0/soundcairn/issues) if something breaks.
 Builds are unsigned for now, so macOS and Windows will warn you about an unknown developer.
 

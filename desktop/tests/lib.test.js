@@ -82,3 +82,23 @@ test("cleanTitle and lastError", () => {
   assert.strictEqual(cleanTitle("/m/The Next Chapter [dQw4w9WgXcQ].mp3"), "The Next Chapter");
   assert.strictEqual(lastError("WARNING: x\nERROR: [youtube] abc123: Video unavailable\n"), "Video unavailable");
 });
+
+test("portrait video is named by its shorter side", () => {
+  const { estimate } = require("../lib");
+  const v = estimate({ duration: 10, formats: [{ format_id: "v", vcodec: "avc1", acodec: "none", width: 1080, height: 1920, tbr: 2000 }] }).video[0];
+  assert.equal(v.label, "Full HD");
+  assert.match(v.note, /^1080p/);
+});
+
+test("a multi-video post previews its first video", () => {
+  const { toPreview } = require("../lib");
+  const f = [{ format_id: "v", vcodec: "avc1", acodec: "none", width: 720, height: 1280, tbr: 900 }];
+  const p = toPreview({ _type: "playlist", title: "Post by x", entries: [{ title: "a", formats: f }, { title: "b", formats: f }] }, "u");
+  assert.equal(p.title, "Post by x (first of 2)");
+  assert.equal(p.video.length, 1);
+});
+
+test("a login-walled post gets a plain message", () => {
+  const { lastError } = require("../lib");
+  assert.match(lastError("ERROR: [Instagram] x: Instagram sent an empty media response. use --cookies"), /needs a login/);
+});
