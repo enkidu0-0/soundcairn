@@ -42,6 +42,7 @@ Most downloaders drown you in formats and codes. Soundcairn shows only what the 
 - **Audio, video, or both in one tap.** Choose *Audio only*, *Video*, or *Video + audio files* (a video and a separate audio file).
 - **Real quality choices.** The list is built from the link itself: 8K, 4K, 2K, Full HD, HD and smaller for video, and the actual audio streams (codec and bitrate) for audio. If a video has no 4K, 4K is not offered. Each choice shows its real file size.
 - **Best means best.** Audio is kept as the original stream, with no re-encoding. MP3 is there when you want it to play anywhere. Video is capped to what you pick.
+- **Convert while you download.** Video is saved as the original by default. If a file will not play (sharp 2K, 4K and 8K videos often arrive as MKV or WebM), choose *MP4* to get H.264 + AAC that plays on Mac, iPhone, Android and TVs, or *MKV* to keep every stream. Converting a long 4K video takes a few minutes.
 - **Pick where it goes.** Choose the save folder right on the download screen.
 - **Progress you can trust.** Live progress, speed, pause, resume and cancel, with several downloads at once.
 - **A library and a player.** Everything you download appears in the Library and plays inside the app (speed, 10-second skip, sleep timer). The three-dots menu shows the file in Finder, File Explorer or Downloads.
@@ -101,7 +102,7 @@ The page never downloads anything itself. It asks the native side to run yt-dlp,
 
 ## Project status
 
-Early release (v0.1.1). The macOS app is the one tested most. The Windows installer and the Android app are new, so expect rough edges,
+Early release (v0.1.2). The macOS app is the one tested most. The Windows installer and the Android app are new, so expect rough edges,
 and please [open an issue](https://github.com/enkidu0-0/soundcairn/issues) if something breaks.
 Builds are unsigned for now, so macOS and Windows will warn you about an unknown developer.
 

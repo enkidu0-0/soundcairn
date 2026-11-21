@@ -24,7 +24,7 @@
     exec(pid, lib.buildArgs(j.opts), line => {
       const m = lib.parseLine(line);
       if (!m) return;
-      if (m.type === "file") j.file = m.path; else listener({ id: jobId, type: "progress", ...j.progress(m) });
+      if (m.type === "file") j.file = m.path; else if (m.type === "convert") listener({ id: jobId, type: "convert" }); else listener({ id: jobId, type: "progress", ...j.progress(m) });
     }).then(out => {
       if (gone()) return;
       out.split("\n").forEach(l => { const m = lib.parseLine(l); if (m && m.type === "file") j.file = m.path; });
@@ -45,7 +45,7 @@
     },
     start: async o => {
       const id = ++seq;
-      jobs.set(id, { opts: { url: o.url, mode: o.mode, quality: o.quality, cover: o.cover, folder }, progress: lib.makeProgress(o.expected || 0) });
+      jobs.set(id, { opts: { url: o.url, mode: o.mode, quality: o.quality, cover: o.cover, format: o.format, folder }, progress: lib.makeProgress(o.expected || 0) });
       launch(id);
       return { id };
     },

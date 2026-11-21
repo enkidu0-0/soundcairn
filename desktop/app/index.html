@@ -106,6 +106,11 @@ h1 { margin: 6px 0 0; font-size: 34px; line-height: 1.12; font-weight: 800; lett
 .sheet { margin: auto -20px 0; background: #fff; color: var(--ink); border-radius: 32px 32px 0 0; padding: 12px 20px max(24px, env(safe-area-inset-bottom, 0px)); }
 .handle { width: 44px; height: 5px; border-radius: 3px; background: #D8D3DB; margin: 0 auto 14px; }
 .sheet h2 { margin: 0 0 12px; font-size: 26px; font-weight: 800; }
+.fmt { margin: 14px 0 4px; }
+.fmt h3 { margin: 0 0 8px; font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.fmt .seg { margin-bottom: 8px; }
+.fmt .seg button { height: 38px; font-size: 15px; }
+.fmt p { margin: 0 4px; font-size: 13px; color: var(--muted); line-height: 1.4; }
 .opts { display: grid; gap: 10px; }
 .opt { display: flex; align-items: center; gap: 14px; text-align: left; border: 1.5px solid var(--line); border-radius: 22px; padding: 10px 18px 10px 12px; width: 100%; }
 .opt.on { background: var(--pink-soft); border-color: var(--pink); }
@@ -447,6 +452,11 @@ h1 { margin: 6px 0 0; font-size: 34px; line-height: 1.12; font-weight: 800; lett
       <div class="seg" id="seg" role="group" aria-label="Type"><button type="button" data-m="audio">Audio</button><button type="button" data-m="video">Video</button><button type="button" data-m="both">Both</button></div>
       <h2>Choose quality</h2>
       <div class="opts" id="opts" role="radiogroup" aria-label="Quality"></div>
+      <div class="fmt" id="fmtBox">
+        <h3>Save video as</h3>
+        <div class="seg" id="fmtSeg" role="group" aria-label="Video format"><button type="button" data-f="original">Original</button><button type="button" data-f="mp4">MP4</button><button type="button" data-f="mkv">MKV</button></div>
+        <p id="fmtNote"></p>
+      </div>
       <div class="cov">
         <span class="ic"><svg class="i"><use href="#i-image"/></svg></span>
         <span class="lbl" id="covLbl">Also save cover image</span>
@@ -561,6 +571,11 @@ const icon = n => `<svg class="i"><use href="#i-${n}"/></svg>`;
 const MODE_HINT = { audio: "Just the sound, saved as an audio file.", video: "A normal video, with its sound.", both: "A video file and a separate audio file." };
 const MODE_NAME = { audio: "Audio", video: "Video" };
 // The qualities this video really offers, and the one picked: the user's click, else Best, else Full HD (or the top audio stream).
+const FMT_NOTE = {
+  original: "Saved exactly as the site provides it. Sharp 2K, 4K and 8K videos often arrive as MKV or WebM.",
+  mp4: "Plays on Mac, iPhone, Android and TVs. If the video is not already MP4-ready it is converted after download, which can take a few minutes for 4K.",
+  mkv: "Keeps every stream untouched in an MKV file. Opens in VLC and most players, and is quick to make.",
+};
 const optionsFor = p => st.mode === "audio" ? p.audio : p.video;
 function chosen(p) {
   const list = optionsFor(p);
@@ -569,7 +584,7 @@ function chosen(p) {
   return (list.find(o => o.height <= 1080) || list[0]).key;
 }
 
-const st = { prev: null, mode: "audio", quality: "", wantBest: false, cover: true, jobs: [], focus: null, lib: [] };
+const st = { prev: null, mode: "audio", format: "original", quality: "", wantBest: false, cover: true, jobs: [], focus: null, lib: [] };
 let cur = "home", toastTimer;
 
 function toast(text) {
@@ -657,9 +672,13 @@ function renderPreview() {
   $("opts").classList.toggle("dense", list.length > 4);
   $("opts").innerHTML = list.map(o => `<button class="opt${o.key === pick ? " on" : ""}" role="radio" aria-checked="${o.key === pick}" data-q="${esc(o.key)}" type="button"><span class="rd">${icon("check")}</span><span class="tx"><b>${esc(o.label)}</b><span>${esc(o.note)}${st.mode === "both" ? " + audio file" : ""}</span></span><span class="sz">${size(o.bytes + extra)}</span></button>`).join("");
   api.tools().then(t => $("whereLbl").textContent = t.folder.replace(/^\/Users\/[^/]+/, "~"));
+  $("fmtBox").hidden = st.mode === "audio";
+  document.querySelectorAll("#fmtSeg button").forEach(b => b.classList.toggle("on", b.dataset.f === st.format));
+  $("fmtNote").textContent = FMT_NOTE[st.format];
   $("startBtn").textContent = { audio: "Download audio", video: "Download video", both: "Download video + audio" }[st.mode];
 }
 $("opts").addEventListener("click", e => { const b = e.target.closest("[data-q]"); if (b) { st.quality = b.dataset.q; renderChips(); renderPreview(); } });
+$("fmtSeg").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if (b) { st.format = b.dataset.f; renderPreview(); } });
 $("swCover").addEventListener("click", e => { st.cover = e.currentTarget.getAttribute("aria-checked") !== "true"; e.currentTarget.setAttribute("aria-checked", st.cover); });
 $("startBtn").addEventListener("click", begin);
 $("wherePick").addEventListener("click", async () => { $("whereLbl").textContent = (await api.pickFolder()).replace(/^\/Users\/[^/]+/, "~"); loadLibrary(); });
@@ -671,7 +690,7 @@ async function begin() {
   const plan = st.mode === "both" ? [["video", key, p.video.find(o => o.key === key).bytes, st.cover], ["audio", "best", p.audio[0].bytes, false]]
     : [[st.mode, key, optionsFor(p).find(o => o.key === key).bytes, st.cover]];
   for (const [mode, quality, expected, cover] of plan) {
-    const r = await api.start({ url: p.url, mode, quality, cover, expected });
+    const r = await api.start({ url: p.url, mode, quality, cover, expected, format: mode === "video" ? st.format : "original" });
     if (r.error) return toast(r.error);
     st.jobs.unshift({ id: r.id, title: p.title, thumb: p.thumb, mode, state: "running", got: 0, total: expected, pct: 0, speed: 0 });
     st.focus = r.id;
@@ -682,9 +701,10 @@ async function begin() {
 api.onDownload(m => {
   const j = st.jobs.find(x => x.id === m.id);
   if (!j) return;
-  if (m.type === "progress") Object.assign(j, { got: m.got, total: m.total, pct: m.pct, speed: m.speed, state: "running" });
-  if (m.type === "done") { j.state = "done"; j.pct = 1; j.file = m.path; loadLibrary(); }
-  if (m.type === "error") { j.state = "error"; toast(m.message); }
+  if (m.type === "progress") Object.assign(j, { got: m.got, total: m.total, pct: m.pct, speed: m.speed, state: "running", converting: false });
+  if (m.type === "convert") Object.assign(j, { state: "running", converting: true, pct: .99 });
+  if (m.type === "done") { j.converting = false; j.state = "done"; j.pct = 1; j.file = m.path; loadLibrary(); }
+  if (m.type === "error") { j.converting = false; j.state = "error"; toast(m.message); }
   if (cur === "downloads") renderDownloads();
 });
 const STATE = { running: "Downloading...", paused: "Paused", done: "Done", error: "Failed" };
@@ -693,11 +713,11 @@ function renderDownloads() {
   $("ring").style.strokeDashoffset = 603.2 * (1 - (j ? j.pct : 0));
   $("pct").textContent = j ? Math.round(j.pct * 100) : 0;
   $("ring").closest(".ringwrap").classList.toggle("done", !!j && j.state === "done");
-  $("dlHead").textContent = !j ? "Downloads" : j.state === "running" && j.pct >= .99 ? "Finishing..." : STATE[j.state];
+  $("dlHead").textContent = !j ? "Downloads" : j.converting ? "Converting..." : j.state === "running" && j.pct >= .99 ? "Finishing..." : STATE[j.state];
   $("dlTitle").textContent = j ? `${MODE_NAME[j.mode]} · ${j.title}` : "";
-  $("dlSize").textContent = j ? `${size(j.got)} of ${size(j.total)}` : "Nothing downloading";
+  $("dlSize").textContent = !j ? "Nothing downloading" : j.converting ? "Making a file that plays on more devices" : `${size(j.got)} of ${size(j.total)}`;
   $("dlSpeed").innerHTML = j && j.state === "running" && j.speed ? `${icon("bolt")} ${(j.speed / 1e6).toFixed(1)} MB/s` : "";
-  $("pauseBtn").hidden = !j; $("cancelBtn").hidden = !j || j.state === "done";
+  $("pauseBtn").hidden = !j || !!j.converting; $("cancelBtn").hidden = !j || j.state === "done";
   const play = j && j.state !== "running";
   $("pauseIcon").innerHTML = `<use href="#i-${play ? "play" : "pause"}"/>`;
   $("pauseLbl").textContent = !j || j.state === "running" ? "Pause" : j.state === "done" ? "Play" : j.state === "paused" ? "Resume" : "Retry";

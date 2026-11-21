@@ -3,9 +3,12 @@
 // A quality is a key: "h:<height>" for video, "a:<format id>" for one original audio stream, "mp3" to convert, "best" for the best m4a.
 const PROGRESS = "download:P|%(progress.downloaded_bytes)s|%(progress.total_bytes)s|%(progress.total_bytes_estimate)s|%(progress.speed)s";
 
-function buildArgs({ url, mode, quality, cover, folder }) {
+// Also reported while a post-processing step (merge, convert) starts, so the app can say "Converting".
+const POST = "postprocess:Q|%(progress.postprocessor)s|%(progress.status)s";
+
+function buildArgs({ url, mode, quality, cover, folder, format }) {
   const args = [
-    "--no-playlist", "--no-warnings", "--newline", "--progress", "--progress-template", PROGRESS,
+    "--no-playlist", "--no-warnings", "--newline", "--progress", "--progress-template", PROGRESS, "--progress-template", POST,
     "-P", folder, "-P", "temp:" + folder + "/.partial",
     "-o", "%(title)s [%(id)s].%(ext)s", "--trim-filenames", "120",
     "--print", "after_move:F|%(filepath)s", "--playlist-items", "1",
@@ -14,7 +17,12 @@ function buildArgs({ url, mode, quality, cover, folder }) {
     const h = Number(quality.split(":")[1]) || 1080;
     // Up to 1080p prefer h264 + aac so the file plays on any device. Above that the sharpest stream is all there is.
     const pick = h > 1080 ? `bv*[height<=${h}]+ba/b[height<=${h}]/b` : `bv*[height<=${h}][vcodec^=avc]+ba[acodec^=mp4a]/bv*[height<=${h}]+ba/b[height<=${h}]/b`;
-    args.push("-f", pick, "--merge-output-format", "mp4/mkv");
+    // Original keeps what the site gives. MP4 and MKV are only asked for when the user chooses them.
+    // Above 1080p the sharpest stream is AV1 or VP9, which can hide inside an mp4 that many players cannot open. For MP4 those are merged as MKV first so the conversion below really re-encodes them.
+    args.push("-f", pick, "--merge-output-format", format === "mkv" || (format === "mp4" && h > 1080) ? "mkv" : "mp4/mkv");
+    if (format === "mkv") args.push("--remux-video", "mkv");
+    // A file that is already H.264 in an mp4 is left alone, anything else is re-encoded so it plays on any device.
+    if (format === "mp4") args.push("--recode-video", "mp4", "--postprocessor-args", "VideoConvertor:-c:v libx264 -preset veryfast -crf 20 -c:a aac -b:a 192k -movflags +faststart");
     // At the same sharpness prefer mp4, which opens in QuickTime and on phones.
     if (h > 1080) args.push("-S", "res,ext");
   } else if (quality === "mp3") {
@@ -35,6 +43,7 @@ function parseLine(line) {
   const f = line.trim().split("|");
   if (f[0] === "P") return { type: "progress", down: num(f[1]), total: num(f[2]) || num(f[3]), speed: num(f[4]) };
   if (f[0] === "F") return { type: "file", path: line.trim().slice(2) };
+  if (f[0] === "Q" && /^(VideoConvertor|VideoRemuxer)$/.test(f[1]) && f[2] === "started") return { type: "convert" };
   return null;
 }
 

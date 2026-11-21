@@ -82,10 +82,12 @@ function launch(id) {
     const m = parseLine(line);
     if (!m) return;
     if (m.type === "file") j.file = m.path;
+    else if (m.type === "convert") send({ id, type: "convert" });
     else send({ id, type: "progress", ...j.progress(m) });
   };
   proc.stdout.on("data", d => { const parts = (buf + d).split(/\r?\n|\r/); buf = parts.pop(); parts.forEach(onLine); });
-  proc.stderr.on("data", d => { err += d; });
+  // yt-dlp reports post-processing steps (convert, remux) on stderr.
+  proc.stderr.on("data", d => { err += d; String(d).split(/\r?\n/).forEach(l => parseLine(l)?.type === "convert" && send({ id, type: "convert" })); });
   proc.on("error", e => send({ id, type: "error", message: e.message }));
   proc.on("close", code => {
     if (j.proc !== proc || j.stopped) return;
@@ -100,7 +102,7 @@ ipcMain.handle("start", (_, o) => {
   const folder = saveFolder();
   fs.mkdirSync(folder, { recursive: true });
   const id = ++seq;
-  jobs.set(id, { opts: { url: o.url, mode: o.mode, quality: o.quality, cover: o.cover, folder }, progress: makeProgress(o.expected || 0) });
+  jobs.set(id, { opts: { url: o.url, mode: o.mode, quality: o.quality, cover: o.cover, format: o.format, folder }, progress: makeProgress(o.expected || 0) });
   launch(id);
   return { id };
 });

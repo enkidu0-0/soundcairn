@@ -102,3 +102,28 @@ test("a login-walled post gets a plain message", () => {
   const { lastError } = require("../lib");
   assert.match(lastError("ERROR: [Instagram] x: Instagram sent an empty media response. use --cookies"), /needs a login/);
 });
+
+test("original format changes nothing, mp4 and mkv are opt-in", () => {
+  const base = { url: "https://x.y/z", mode: "video", quality: "h:2160", folder: "/f" };
+  const orig = buildArgs(base), mp4 = buildArgs({ ...base, format: "mp4" }), mkv = buildArgs({ ...base, format: "mkv" });
+  assert.deepEqual(buildArgs({ ...base, format: "original" }), orig);
+  assert.ok(!orig.includes("--recode-video") && !orig.includes("--remux-video"));
+  assert.ok(mp4.includes("--recode-video") && mp4.includes("mp4"));
+  assert.equal(mkv[mkv.indexOf("--merge-output-format") + 1], "mkv");
+  assert.ok(mkv.includes("--remux-video"));
+});
+
+test("yt-dlp convert lines are recognised", () => {
+  const { parseLine } = require("../lib");
+  assert.deepEqual(parseLine("Q|VideoConvertor|started"), { type: "convert" });
+  assert.deepEqual(parseLine("Q|VideoRemuxer|started"), { type: "convert" });
+  assert.equal(parseLine("Q|VideoConvertor|finished"), null);
+  assert.equal(parseLine("Q|MoveFiles|started"), null);
+});
+
+test("mp4 above 1080p merges as mkv first so it is re-encoded", () => {
+  const at = (h, format) => { const a = buildArgs({ url: "https://x.y/z", mode: "video", quality: "h:" + h, folder: "/f", format }); return a[a.indexOf("--merge-output-format") + 1]; };
+  assert.equal(at(2160, "mp4"), "mkv");
+  assert.equal(at(1080, "mp4"), "mp4/mkv");
+  assert.equal(at(2160, "original"), "mp4/mkv");
+});
